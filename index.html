@@ -2,52 +2,93 @@
 <html lang="my">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>May Lay Game Shop - MLBB Diamonds</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: #0b1120; color: #f8fafc; padding: 14px; padding-bottom: 95px; }
-    .header { text-align: center; margin-bottom: 16px; }
-    .header h1 { font-size: 19px; color: #38bdf8; margin-bottom: 4px; font-weight: 700; }
-    .header p { font-size: 12px; color: #94a3b8; }
+    body { background-color: #0f172a; color: #f8fafc; padding: 16px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+    .header { text-align: center; margin-bottom: 20px; width: 100%; max-width: 480px; }
+    .header h1 { font-size: 20px; font-weight: 700; color: #38bdf8; margin-bottom: 6px; }
+    .header p { font-size: 13px; color: #94a3b8; }
+    .currency-switcher { display: flex; background: #1e293b; border-radius: 12px; padding: 4px; margin-bottom: 20px; width: 100%; max-width: 480px; border: 1px solid #334155; }
+    .curr-btn { flex: 1; padding: 10px; border: none; background: transparent; color: #94a3b8; font-size: 14px; font-weight: 600; border-radius: 8px; cursor: pointer; }
+    .curr-btn.active { background: #38bdf8; color: #0f172a; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; max-width: 480px; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 14px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; gap: 8px; }
+    .card .title { font-size: 15px; font-weight: 600; color: #f1f5f9; }
+    .card .price { font-size: 16px; font-weight: 700; color: #fbbf24; }
+    .card button { background: #0284c7; color: white; border: none; padding: 8px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  </style>
+</head>
+<body>
 
-    .currency-tabs {
-      display: flex;
-      background: #1e293b;
-      border-radius: 10px;
-      padding: 4px;
-      margin-bottom: 16px;
-      border: 1px solid #334155;
-    }
-    .tab-btn {
-      flex: 1;
-      padding: 10px 0;
-      text-align: center;
-      font-size: 14px;
-      font-weight: 700;
-      border-radius: 8px;
-      border: none;
-      background: transparent;
-      color: #94a3b8;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .tab-btn.active {
-      background: #0284c7;
-      color: #ffffff;
-      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+  <div class="header">
+    <h1>💎 May Lay Game Shop</h1>
+    <p>Mobile Legends စိန် နှင့် ပက်ကေ့ချ်များ ဝယ်ယူရန်</p>
+  </div>
+
+  <div class="currency-switcher">
+    <button class="curr-btn active" id="btn-mmk" onclick="setCurrency('MMK')">🇲🇲 မြန်မာကျပ် (Ks)</button>
+    <button class="curr-btn" id="btn-thb" onclick="setCurrency('THB')">🇹🇭 ထိုင်းဘတ် (฿)</button>
+  </div>
+
+  <div class="grid" id="items-container"></div>
+
+  <script>
+    if (window.Telegram && window.Telegram.WebApp) {
+      window.Telegram.WebApp.ready();
+      window.Telegram.WebApp.expand();
     }
 
-    .card { background: #151f32; border-radius: 12px; padding: 14px; margin-bottom: 14px; border: 1px solid #1e293b; }
-    .card h2 { font-size: 14px; margin-bottom: 10px; color: #e2e8f0; display: flex; align-items: center; gap: 6px; }
-    .input-group { display: flex; gap: 8px; }
-    input { width: 100%; padding: 11px; border-radius: 8px; border: 1px solid #334155; background: #0b1120; color: #fff; font-size: 14px; outline: none; }
-    input:focus { border-color: #38bdf8; }
-    .notice { font-size: 11.5px; color: #fbbf24; line-height: 1.5; margin-top: 8px; }
+    const products = [
+      { name: "Weekly Diamond Pass", mmk: "7,000 Ks", thb: "65 ฿" },
+      { name: "86 Diamonds", mmk: "5,000 Ks", thb: "45 ฿" },
+      { name: "172 Diamonds", mmk: "9,800 Ks", thb: "90 ฿" },
+      { name: "257 Diamonds", mmk: "14,500 Ks", thb: "135 ฿" },
+      { name: "344 Diamonds", mmk: "19,500 Ks", thb: "180 ฿" },
+      { name: "429 Diamonds", mmk: "24,500 Ks", thb: "225 ฿" },
+      { name: "514 Diamonds", mmk: "29,000 Ks", thb: "270 ฿" },
+      { name: "706 Diamonds", mmk: "39,000 Ks", thb: "360 ฿" },
+      { name: "1050 Diamonds", mmk: "58,000 Ks", thb: "530 ฿" },
+      { name: "2195 Diamonds", mmk: "118,000 Ks", thb: "1,080 ฿" }
+    ];
 
-    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-    .item { background: #0b1120; border: 1px solid #1e293b; border-radius: 10px; padding: 10px 8px; text-align: center; cursor: pointer; transition: 0.15s; }
-    .item.active { border-color: #38bdf8; background: #132d4b; }
-    .item-name { font-size: 12.5px; font-weight: 600; color: #f1f5f9; margin-bottom: 4px; }
-    .item-price { font-size: 13.5px; color: #38bdf8; font-weight
+    let currentCurrency = 'MMK';
+
+    function renderProducts() {
+      const container = document.getElementById('items-container');
+      container.innerHTML = '';
+      products.forEach(p => {
+        const price = currentCurrency === 'MMK' ? p.mmk : p.thb;
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="title">${p.name}</div>
+          <div class="price">${price}</div>
+          <button onclick="orderItem('${p.name}', '${price}')">ဝယ်ယူမည်</button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function setCurrency(curr) {
+      currentCurrency = curr;
+      document.getElementById('btn-mmk').className = curr === 'MMK' ? 'curr-btn active' : 'curr-btn';
+      document.getElementById('btn-thb').className = curr === 'THB' ? 'curr-btn active' : 'curr-btn';
+      renderProducts();
+    }
+
+    function orderItem(name, price) {
+      const text = `မင်္ဂလာပါ၊ ${name} (${price}) ဝယ်ယူလိုပါသည်ခင်ဗျာ။`;
+      if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.sendData) {
+        window.Telegram.WebApp.sendData(text);
+      } else {
+        alert(text);
+      }
+    }
+
+    renderProducts();
+  </script>
+</body>
+</html>
