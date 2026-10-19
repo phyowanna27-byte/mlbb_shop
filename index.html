@@ -28,7 +28,6 @@
     .card button { background: #0284c7; color: white; border: none; padding: 8px; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 4px; }
     .card button:active { background: #0369a1; }
 
-    /* Modal Popup Form */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 100; justify-content: center; align-items: flex-start; padding: 16px; overflow-y: auto; }
     .modal-box { background: #1e293b; border: 1px solid #38bdf8; border-radius: 16px; width: 100%; max-width: 440px; padding: 18px; margin: auto 0; }
     .modal-box h3 { color: #38bdf8; font-size: 17px; margin-bottom: 4px; text-align: center; }
@@ -86,25 +85,25 @@
       <div class="badge">အထူးတန်</div>
       <div class="title">Weekly Diamond Pass</div>
       <div class="price" id="p-wdp">7,000 Ks</div>
-      <button onclick="openModal('Weekly Diamond Pass')">ဝယ်ယူမည်</button>
+      <button onclick="openModal('Weekly Diamond Pass', document.getElementById('p-wdp').innerText)">ဝယ်ယူမည်</button>
     </div>
     <div class="card" id="card-twilight">
       <div class="badge">Skin ရယူရန်</div>
       <div class="title">Twilight Pass</div>
       <div class="price" id="p-twilight">37,500 Ks</div>
-      <button onclick="openModal('Twilight Pass')">ဝယ်ယူမည်</button>
+      <button onclick="openModal('Twilight Pass', document.getElementById('p-twilight').innerText)">ဝယ်ယူမည်</button>
     </div>
     <div class="card" id="card-elite">
       <div class="badge">Bundle</div>
       <div class="title">Weekly Elite Bundle</div>
       <div class="price" id="p-elite">3,800 Ks</div>
-      <button onclick="openModal('Weekly Elite Bundle')">ဝယ်ယူမည်</button>
+      <button onclick="openModal('Weekly Elite Bundle', document.getElementById('p-elite').innerText)">ဝယ်ယူမည်</button>
     </div>
     <div class="card" id="card-epic">
       <div class="badge">Bundle</div>
       <div class="title">Monthly Epic Bundle</div>
       <div class="price" id="p-epic">18,800 Ks</div>
-      <button onclick="openModal('Monthly Epic Bundle')">ဝယ်ယူမည်</button>
+      <button onclick="openModal('Monthly Epic Bundle', document.getElementById('p-epic').innerText)">ဝယ်ယူမည်</button>
     </div>
   </div>
 
@@ -114,4 +113,5 @@
     <div class="card">
       <div class="badge">Double 2x</div>
       <div class="title">50 + 50 Bonus 💎</div>
-      <div class="price" id="p-d50
+      <div class="price" id="p-d50">3,800 Ks</div>
+      <button onclick="openModal('50 + 50 Bonus 💎', document.getElementById('p-d50').innerText)">ဝယ်ယူ
