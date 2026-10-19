@@ -69,6 +69,14 @@
       border-radius: 6px; color: white; font-size: 14px;
     }
 
+    /* Nickname Check Status */
+    .nick-box {
+      font-size: 12px; margin-top: 4px; padding: 6px 10px; border-radius: 6px; display: none;
+    }
+    .nick-box.success { display: block; background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #86efac; }
+    .nick-box.error { display: block; background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #fca5a5; }
+    .nick-box.loading { display: block; background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #7dd3fc; }
+
     .payment-box {
       background: #0b1329; border: 1px solid #334155; border-radius: 6px;
       padding: 12px; margin-bottom: 15px; font-size: 12px; line-height: 1.6;
@@ -117,15 +125,18 @@
       <div style="display: flex; gap: 10px;">
         <div class="form-group" style="flex: 2;">
           <label>User ID</label>
-          <input type="number" id="userId" placeholder="ဥပမာ - 12345678">
+          <input type="number" id="userId" placeholder="12345678" oninput="checkNickname()">
         </div>
         <div class="form-group" style="flex: 1;">
           <label>Server ID</label>
-          <input type="number" id="zoneId" placeholder="ဥပမာ - 1234">
+          <input type="number" id="zoneId" placeholder="1234" oninput="checkNickname()">
         </div>
       </div>
 
-      <div class="payment-box" id="paymentDetails"></div>
+      <!-- In-game Nickname Status Box -->
+      <div id="nicknameBox" class="nick-box"></div>
+
+      <div class="payment-box" id="paymentDetails" style="margin-top: 12px;"></div>
 
       <div class="form-group">
         <label>ငွေလွှဲပြေစာ (စလစ်) ပုံရွေးပါ</label>
@@ -144,6 +155,8 @@
     let currentCurrency = 'THB';
     let allItems = [];
     let selectedItem = null;
+    let verifiedNickname = "";
+    let checkTimeout = null;
 
     // Google Sheets မှ ဒေတာ Live ရယူခြင်း
     async function fetchPrices() {
@@ -169,7 +182,7 @@
         renderCatalog();
       } catch (err) {
         document.getElementById('catalog-container').innerHTML = 
-          '<div class="loading-box" style="color: #ef4444;">Google Sheet ဒေတာရယူ၍ မရနိုင်ပါ။ Sheet Access ကို "Anyone with the link" ပေးထားခြင်း ရှိမရှိ စစ်ဆေးပေးပါ။</div>';
+          '<div class="loading-box" style="color: #ef4444;">Google Sheet ဒေတာရယူ၍ မရနိုင်ပါ။</div>';
       }
     }
 
@@ -186,7 +199,7 @@
 
       allItems.forEach((item, index) => {
         const priceVal = (currentCurrency === 'MMK') ? item.mmk : item.thb;
-        if (priceVal <= 0) return; // 0 ဖြစ်နေသော ပစ္စည်းများကို မပြသပါ
+        if (priceVal <= 0) return;
 
         if (!categories[item.category]) {
           categories[item.category] = [];
@@ -247,11 +260,56 @@
         `;
       }
 
+      // Reset ID and Nickname box
+      document.getElementById('userId').value = '';
+      document.getElementById('zoneId').value = '';
+      const nickBox = document.getElementById('nicknameBox');
+      nickBox.style.display = 'none';
+      verifiedNickname = "";
+
       document.getElementById('orderModal').style.display = 'flex';
     }
 
     function closeModal() {
       document.getElementById('orderModal').style.display = 'none';
+    }
+
+    // MLBB In-game Nickname စစ်ဆေးသည့် Function
+    function checkNickname() {
+      const uid = document.getElementById('userId').value.trim();
+      const zone = document.getElementById('zoneId').value.trim();
+      const nickBox = document.getElementById('nicknameBox');
+
+      clearTimeout(checkTimeout);
+
+      if (uid.length >= 6 && zone.length >= 4) {
+        nickBox.className = 'nick-box loading';
+        nickBox.innerText = '🔍 ဂိမ်းနာမည် စစ်ဆေးနေပါသည်...';
+
+        checkTimeout = setTimeout(async () => {
+          try {
+            const res = await fetch(`https://api.isan.eu.org/nickname/ml?id=${uid}&zone=${zone}`);
+            const data = await res.json();
+
+            if (data.success && data.name) {
+              verifiedNickname = decodeURIComponent(data.name);
+              nickBox.className = 'nick-box success';
+              nickBox.innerHTML = `✅ <b>ဂိမ်းနာမည်:</b> ${verifiedNickname}`;
+            } else {
+              verifiedNickname = "";
+              nickBox.className = 'nick-box error';
+              nickBox.innerText = '⚠️ ID သို့မဟုတ် Server ID မှားယွင်းနေပါသည်။';
+            }
+          } catch (e) {
+            verifiedNickname = "";
+            nickBox.className = 'nick-box error';
+            nickBox.innerText = '⚠️ ဂိမ်းနာမည် ရှာမတွေ့ပါ။ ID သေချာစစ်ဆေးပေးပါ။';
+          }
+        }, 500);
+      } else {
+        nickBox.style.display = 'none';
+        verifiedNickname = "";
+      }
     }
 
     async function submitOrder() {
@@ -284,11 +342,14 @@
         ? `${selectedItem.mmk.toLocaleString()} Ks` 
         : `${selectedItem.thb.toLocaleString()} ฿`;
 
+      const nickText = verifiedNickname ? `🎮 Nickname : ${verifiedNickname}\n` : '';
+
       const caption = `🛒 အော်ဒါအသစ် ရောက်ရှိပါပြီ!\n\n` +
         `👤 ဝယ်သူ : ${customerName} (ID: ${customerId})\n` +
         `📦 ပက်ကေ့ချ် : ${selectedItem.name}\n` +
         `💰 ကျသင့်ငွေ : ${priceText}\n` +
-        `🎮 User ID : ${uid} (${zone})`;
+        nickText +
+        `🆔 User ID : ${uid} (${zone})`;
 
       const callbackData = `ok:${customerId}:${uid}(${zone}):${selectedItem.name}`;
 
