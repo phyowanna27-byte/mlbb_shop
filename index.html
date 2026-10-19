@@ -77,9 +77,9 @@
       border-radius: 6px; color: white; font-size: 14px;
     }
 
-    /* Nickname & Server Status Box */
+    /* Account Status Box (Nickname + Server Region) */
     .nick-box {
-      font-size: 13px; margin-top: 6px; padding: 10px 12px; border-radius: 8px; display: none; line-height: 1.5;
+      font-size: 13px; margin-top: 4px; padding: 10px 12px; border-radius: 8px; display: none; line-height: 1.6;
     }
     .nick-box.success { display: block; background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #86efac; }
     .nick-box.error { display: block; background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #fca5a5; }
@@ -93,6 +93,9 @@
     .submit-btn {
       width: 100%; background: #22c55e; color: white; border: none;
       padding: 12px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer;
+    }
+    .submit-btn:disabled {
+      background: #475569; cursor: not-allowed; opacity: 0.7;
     }
   </style>
 </head>
@@ -109,7 +112,7 @@
   </div>
 
   <div class="notice">
-    📌 <b>အချက်အလက်:</b> User ID နှင့် Server ID ဖြည့်ပြီးပါက Nickname နှင့် Server အလိုအလျောက် ပေါ်လာပါမည်။<br>
+    📌 <b>လိုအပ်ချက်:</b> User ID + Server ID ထည့်ပါက နာမည်နှင့် ဆာဗာဒေသ တန်းပေါ်ပါမည်။<br>
     ⚡ <b>ကြာမြင့်ချိန်:</b> စလစ်စစ်ဆေးပြီးပါက စိန်တန်းရောက်ပါမည်။
   </div>
 
@@ -141,7 +144,7 @@
         </div>
       </div>
 
-      <!-- In-game Nickname & Server Region Status Box -->
+      <!-- In-game Nickname & Server Display Box -->
       <div id="nicknameBox" class="nick-box"></div>
 
       <div class="payment-box" id="paymentDetails" style="margin-top: 12px;"></div>
@@ -164,8 +167,24 @@
     let allItems = [];
     let selectedItem = null;
     let verifiedNickname = "";
-    let detectedServer = "";
+    let verifiedServerRegion = "";
     let checkTimeout = null;
+
+    // Server ID မှတစ်ဆင့် သက်ဆိုင်ရာ Region ခွဲခြမ်းသတ်မှတ်ခြင်း
+    function detectRegion(zone) {
+      const z = parseInt(zone, 10);
+      if (isNaN(z)) return "Global / အခြား";
+
+      // Server ID Range များအလိုက် ခွဲခြားခြင်း
+      if (z >= 16000 && z <= 17000) return "🇲🇲 Myanmar Server (မြန်မာ)";
+      if (z >= 1000 && z <= 2500) return "🇮🇩 Indonesia Server (အင်ဒို)";
+      if (z >= 9000 && z <= 10000) return "🇹🇭 Thailand Server (ထိုင်း)";
+      if (z >= 8000 && z <= 8999) return "🇲🇾 Malaysia Server (မလေး)";
+      if (z >= 3000 && z <= 3999) return "🇵🇭 Philippines Server (ဖိလစ်ပိုင်)";
+      if (z >= 6000 && z <= 6999) return "🇧🇷 Brazil Server (ဘရာဇီး)";
+      if (z >= 4000 && z <= 5999) return "🌍 Global / အခြား Server";
+      return "🌏 Asia / အခြား Server";
+    }
 
     async function fetchPrices() {
       const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv`;
@@ -273,7 +292,7 @@
       const nickBox = document.getElementById('nicknameBox');
       nickBox.style.display = 'none';
       verifiedNickname = "";
-      detectedServer = "";
+      verifiedServerRegion = "";
 
       document.getElementById('orderModal').style.display = 'flex';
     }
@@ -282,27 +301,7 @@
       document.getElementById('orderModal').style.display = 'none';
     }
 
-    // Zone ID ကို အခြေခံ၍ Server Country ခွဲခြားသတ်မှတ်ခြင်း
-    function detectServerRegion(zone) {
-      const z = parseInt(zone, 10);
-      if (isNaN(z)) return "Global Server";
-
-      if ((z >= 16000 && z <= 17999) || (z >= 3000 && z <= 3200)) {
-        return "🇲🇲 Myanmar Server";
-      } else if (z >= 9000 && z <= 9999) {
-        return "🇹🇭 Thailand Server";
-      } else if (z >= 2000 && z <= 2999) {
-        return "🇮🇩 Indonesia Server";
-      } else if (z >= 3300 && z <= 3999) {
-        return "🇵🇭 Philippines Server";
-      } else if (z >= 4000 && z <= 4999) {
-        return "🇲🇾 Malaysia Server";
-      } else {
-        return "🌏 Asian / Global Server";
-      }
-    }
-
-    // Nickname & Server စစ်ဆေးခြင်း
+    // In-game Nickname & Server Region Checking
     function checkNickname() {
       const uid = document.getElementById('userId').value.trim();
       const zone = document.getElementById('zoneId').value.trim();
@@ -311,14 +310,13 @@
       clearTimeout(checkTimeout);
 
       if (uid.length >= 6 && zone.length >= 4) {
-        detectedServer = detectServerRegion(zone);
+        verifiedServerRegion = detectRegion(zone);
         nickBox.className = 'nick-box loading';
-        nickBox.innerText = '🔍 အချက်အလက်နှင့် ဆာဗာ စစ်ဆေးနေပါသည်...';
+        nickBox.innerHTML = `🌐 <b>ဆာဗာဒေသ:</b> ${verifiedServerRegion}<br>🔍 ဂိမ်းနာမည် စစ်ဆေးနေပါသည်...`;
 
         checkTimeout = setTimeout(async () => {
           let foundName = "";
 
-          // Fast Direct MLBB Lookup
           try {
             const res = await fetch(`https://api.isan.eu.org/nickname/ml?id=${uid}&zone=${zone}`);
             const data = await res.json();
@@ -341,22 +339,22 @@
             verifiedNickname = foundName;
             nickBox.className = 'nick-box success';
             nickBox.innerHTML = `
-              ✅ <b>ဂိမ်းနာမည်:</b> <span style="font-size:14px; color:#4ade80;">${verifiedNickname}</span><br>
-              🌐 <b>ဆာဗာ:</b> <span style="font-size:13px; color:#38bdf8;">${detectedServer}</span>
+              🎮 <b>ဂိမ်းနာမည်:</b> <span style="font-size:14px; color:#4ade80;">${verifiedNickname}</span><br>
+              🌐 <b>ဆာဗာဒေသ:</b> <span style="color:#38bdf8;">${verifiedServerRegion}</span>
             `;
           } else {
             verifiedNickname = "";
             nickBox.className = 'nick-box error';
             nickBox.innerHTML = `
-              🌐 <b>ဆာဗာ:</b> <span style="color:#38bdf8;">${detectedServer}</span><br>
-              <span style="font-size:11px; color:#cbd5e1;">(အမည်စစ်မရသေးပါက ID မှန်ပါက အော်ဒါ ဆက်တင်နိုင်ပါသည်)</span>
+              🌐 <b>ဆာဗာဒေသ:</b> ${verifiedServerRegion}<br>
+              ⚠️ အမည်စစ်မရသေးပါ (ID မှန်ကန်ပါက အော်ဒါ ဆက်တင်နိုင်ပါသည်)
             `;
           }
         }, 250);
       } else {
         nickBox.style.display = 'none';
         verifiedNickname = "";
-        detectedServer = "";
+        verifiedServerRegion = "";
       }
     }
 
@@ -391,15 +389,14 @@
         : `${selectedItem.thb.toLocaleString()} ฿`;
 
       const displayNick = verifiedNickname ? verifiedNickname : "စစ်ဆေးမရပါ";
-      const displayServer = detectedServer ? detectedServer : detectServerRegion(zone);
+      const displayRegion = verifiedServerRegion ? verifiedServerRegion : detectRegion(zone);
 
-      // စလစ်ပုံနှင့်အတူ Admin ထံ ပေးပို့မည့် အပြည့်အစုံ အော်ဒါစာသား
       const caption = `🛒 အော်ဒါအသစ် ရောက်ရှိပါပြီ!\n\n` +
         `👤 ဝယ်သူ : ${customerName} (ID: ${customerId})\n` +
         `📦 ပက်ကေ့ချ် : ${selectedItem.name}\n` +
         `💰 ကျသင့်ငွေ : ${priceText}\n` +
         `🎮 Nickname : ${displayNick}\n` +
-        `🌐 Server : ${displayServer}\n` +
+        `🌐 Server ဒေသ : ${displayRegion}\n` +
         `🆔 User ID : ${uid} (${zone})`;
 
       const callbackData = `ok:${customerId}`;
@@ -427,4 +424,17 @@
           closeModal();
           if (window.Telegram?.WebApp) window.Telegram.WebApp.close();
         } else {
-          alert("Telegram Error: " + res.
+          alert("Telegram Error: " + res.description);
+        }
+      } catch (err) {
+        alert("လိုင်းအမှားဖြစ်ပေါ်ပါသည်: " + err.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "ငွေလွှဲပြေစာ ပို့မည်";
+      }
+    }
+
+    fetchPrices();
+  </script>
+</body>
+</html>
