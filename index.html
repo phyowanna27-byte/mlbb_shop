@@ -82,10 +82,87 @@
     <p>စိန်နှင့် ပက်ကေ့ချ်များ အမြန်ဖြည့်သွင်းရန်</p>
   </div>
 
+  <!-- Currency Switcher -->
   <div class="currency-switch">
-    <button id="btn-mmk" class="currency-btn active" onclick="switchCurrency('MMK')">🇲🇲 မြန်မာကျပ် (Ks)</button>
-    <button id="btn-thb" class="currency-btn" onclick="switchCurrency('THB')">🇹🇭 ထိုင်းဘတ် (฿)</button>
+    <button id="btn-mmk" class="currency-btn active" onclick="setCurrency('MMK')">🇲🇲 မြန်မာကျပ် (Ks)</button>
+    <button id="btn-thb" class="currency-btn" onclick="setCurrency('THB')">🇹🇭 ထိုင်းဘတ် (฿)</button>
   </div>
 
   <div class="notice">
     📌 <b>လိုအပ်ချက်:</b> User ID + Zone ID (Server ID)<br>
+    ⚡ <b>ကြာမြင့်ချိန်:</b> အချိန်စောင့်စရာမလိုဘဲ တန်းရောက်ပါသည်။
+  </div>
+
+  <!-- PASS & BUNDLE SECTION -->
+  <div class="section-title">🔥 PASS & BUNDLE ပက်ကေ့ချ်များ</div>
+  <div class="grid">
+    <div class="card">
+      <span class="badge">အထူးတန်</span>
+      <div class="card-title">Weekly Diamond Pass</div>
+      <div class="card-price" id="price-pass1">7,000 Ks</div>
+      <button class="buy-btn" onclick="openOrder('Weekly Diamond Pass', 7000, 75)">ဝယ်ယူမည်</button>
+    </div>
+    <div class="card">
+      <span class="badge">Skin ရယူရန်</span>
+      <div class="card-title">Twilight Pass</div>
+      <div class="card-price" id="price-pass2">37,500 Ks</div>
+      <button class="buy-btn" onclick="openOrder('Twilight Pass', 37500, 395)">ဝယ်ယူမည်</button>
+    </div>
+    <div class="card">
+      <span class="badge">Bundle</span>
+      <div class="card-title">Weekly Elite Bundle</div>
+      <div class="card-price" id="price-pass3">3,800 Ks</div>
+      <button class="buy-btn" onclick="openOrder('Weekly Elite Bundle', 3800, 40)">ဝယ်ယူမည်</button>
+    </div>
+    <div class="card">
+      <span class="badge">Bundle</span>
+      <div class="card-title">Monthly Epic Bundle</div>
+      <div class="card-price" id="price-pass4">18,800 Ks</div>
+      <button class="buy-btn" onclick="openOrder('Monthly Epic Bundle', 18800, 200)">ဝယ်ယူမည်</button>
+    </div>
+  </div>
+
+  <!-- DIAMONDS SECTION -->
+  <div class="section-title">⚡ စိန်သီးသန့် (DIAMONDS)</div>
+  <div class="grid">
+    <div class="card">
+      <span class="badge">Direct</span>
+      <div class="card-title">86 Diamonds</div>
+      <div class="card-price" id="price-dia1">5,800 Ks</div>
+      <button class="buy-btn" onclick="openOrder('86 Diamonds', 5800, 60)">ဝယ်ယူမည်</button>
+    </div>
+    <div class="card">
+      <span class="badge">Direct</span>
+      <div class="card-title">172 Diamonds</div>
+      <div class="card-price" id="price-dia2">11,500 Ks</div>
+      <button class="buy-btn" onclick="openOrder('172 Diamonds', 11500, 120)">ဝယ်ယူမည်</button>
+    </div>
+    <div class="card">
+      <span class="badge">Direct</span>
+      <div class="card-title">257 Diamonds</div>
+      <div class="card-price" id="price-dia3">17,000 Ks</div>
+      <button class="buy-btn" onclick="openOrder('257 Diamonds', 17000, 180)">ဝယ်ယူမည်</button>
+    </div>
+    <div class="card">
+      <span class="badge">Direct</span>
+      <div class="card-title">706 Diamonds</div>
+      <div class="card-price" id="price-dia4">46,000 Ks</div>
+      <button class="buy-btn" onclick="openOrder('706 Diamonds', 46000, 480)">ဝယ်ယူမည်</button>
+    </div>
+  </div>
+
+  <!-- Order Modal -->
+  <div class="modal" id="orderModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>အော်ဒါတင်ရန်</h3>
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+      </div>
+
+      <div class="form-group">
+        <label>ဝယ်ယူမည့် ပစ္စည်းနှင့် စျေးနှုန်း</label>
+        <input type="text" id="selectedItemDisplay" readonly style="color: #38bdf8; font-weight: bold;">
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <div class="form-group" style="flex:
