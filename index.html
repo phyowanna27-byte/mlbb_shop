@@ -77,13 +77,15 @@
       border-radius: 6px; color: white; font-size: 14px;
     }
 
-    /* Account Status Box (Nickname + Server Region) */
+    /* Account Status Box */
     .nick-box {
-      font-size: 13px; margin-top: 4px; padding: 10px 12px; border-radius: 8px; display: none; line-height: 1.6;
+      font-size: 13px; margin-top: 10px; padding: 10px 12px; border-radius: 8px; 
+      display: block; line-height: 1.6; background: rgba(15, 23, 42, 0.6);
+      border: 1px dashed #475569; color: #94a3b8;
     }
-    .nick-box.success { display: block; background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #86efac; }
-    .nick-box.error { display: block; background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #fca5a5; }
-    .nick-box.loading { display: block; background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #7dd3fc; }
+    .nick-box.success { background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #86efac; }
+    .nick-box.error { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #fca5a5; }
+    .nick-box.loading { background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #7dd3fc; }
 
     .payment-box {
       background: #0b1329; border: 1px solid #334155; border-radius: 6px;
@@ -112,7 +114,7 @@
   </div>
 
   <div class="notice">
-    📌 <b>လိုအပ်ချက်:</b> User ID + Server ID ထည့်ပါက နာမည်နှင့် ဆာဗာဒေသ တန်းပေါ်ပါမည်။<br>
+    📌 <b>အချက်အလက်ဖြည့်ရန်:</b> User ID နှင့် Server ID ထည့်ပါက နာမည်နှင့် ဆာဗာဒေသ တန်းပေါ်ပါမည်။<br>
     ⚡ <b>ကြာမြင့်ချိန်:</b> စလစ်စစ်ဆေးပြီးပါက စိန်တန်းရောက်ပါမည်။
   </div>
 
@@ -145,7 +147,10 @@
       </div>
 
       <!-- In-game Nickname & Server Display Box -->
-      <div id="nicknameBox" class="nick-box"></div>
+      <div id="nicknameBox" class="nick-box">
+        🎮 <b>ဂိမ်းနာမည်:</b> (ID ရိုက်ထည့်ပါ)<br>
+        🌐 <b>ဆာဗာဒေသ:</b> (Server ID ရိုက်ထည့်ပါ)
+      </div>
 
       <div class="payment-box" id="paymentDetails" style="margin-top: 12px;"></div>
 
@@ -170,12 +175,11 @@
     let verifiedServerRegion = "";
     let checkTimeout = null;
 
-    // Server ID မှတစ်ဆင့် သက်ဆိုင်ရာ Region ခွဲခြမ်းသတ်မှတ်ခြင်း
+    // Server ID မှတစ်ဆင့် Server ဒေသ ခွဲခြမ်းသတ်မှတ်ခြင်း
     function detectRegion(zone) {
       const z = parseInt(zone, 10);
       if (isNaN(z)) return "Global / အခြား";
 
-      // Server ID Range များအလိုက် ခွဲခြားခြင်း
       if (z >= 16000 && z <= 17000) return "🇲🇲 Myanmar Server (မြန်မာ)";
       if (z >= 1000 && z <= 2500) return "🇮🇩 Indonesia Server (အင်ဒို)";
       if (z >= 9000 && z <= 10000) return "🇹🇭 Thailand Server (ထိုင်း)";
@@ -290,7 +294,8 @@
       document.getElementById('userId').value = '';
       document.getElementById('zoneId').value = '';
       const nickBox = document.getElementById('nicknameBox');
-      nickBox.style.display = 'none';
+      nickBox.className = 'nick-box';
+      nickBox.innerHTML = '🎮 <b>ဂိမ်းနာမည်:</b> (ID ရိုက်ထည့်ပါ)<br>🌐 <b>ဆာဗာဒေသ:</b> (Server ID ရိုက်ထည့်ပါ)';
       verifiedNickname = "";
       verifiedServerRegion = "";
 
@@ -301,7 +306,7 @@
       document.getElementById('orderModal').style.display = 'none';
     }
 
-    // In-game Nickname & Server Region Checking
+    // Direct MLBB Nickname & Server Region Check
     function checkNickname() {
       const uid = document.getElementById('userId').value.trim();
       const zone = document.getElementById('zoneId').value.trim();
@@ -317,6 +322,7 @@
         checkTimeout = setTimeout(async () => {
           let foundName = "";
 
+          // API 1: Direct Isan ML Lookup
           try {
             const res = await fetch(`https://api.isan.eu.org/nickname/ml?id=${uid}&zone=${zone}`);
             const data = await res.json();
@@ -325,6 +331,7 @@
             }
           } catch(e) {}
 
+          // API 2: Direct API Games (Backup)
           if (!foundName) {
             try {
               const res2 = await fetch(`https://v1.apigames.id/merchant/M230303XXXX/cek-username/mobilelegend?user_id=${uid}${zone}`);
@@ -352,7 +359,8 @@
           }
         }, 250);
       } else {
-        nickBox.style.display = 'none';
+        nickBox.className = 'nick-box';
+        nickBox.innerHTML = '🎮 <b>ဂိမ်းနာမည်:</b> (ID ရိုက်ထည့်ပါ)<br>🌐 <b>ဆာဗာဒေသ:</b> (Server ID ရိုက်ထည့်ပါ)';
         verifiedNickname = "";
         verifiedServerRegion = "";
       }
