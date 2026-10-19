@@ -6,43 +6,44 @@
   <title>May Lay Game Shop</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
-    body { background-color: #0f172a; color: #f8fafc; padding: 15px; padding-bottom: 50px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
+    body { background-color: #0b1329; color: #f8fafc; padding: 15px; padding-bottom: 60px; }
     
-    .header { text-align: center; margin-bottom: 20px; }
+    .header { text-align: center; margin-bottom: 16px; }
     .header h1 { font-size: 20px; color: #38bdf8; }
-    .header p { font-size: 13px; color: #94a3b8; margin-top: 4px; }
+    .header p { font-size: 12px; color: #94a3b8; margin-top: 4px; }
 
     /* Currency Switch */
-    .currency-switch { display: flex; gap: 10px; margin-bottom: 20px; }
+    .currency-switch { display: flex; gap: 10px; margin-bottom: 16px; }
     .currency-btn {
       flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #334155;
       background: #1e293b; color: #94a3b8; font-size: 14px; font-weight: bold; cursor: pointer;
     }
     .currency-btn.active {
       background: #0284c7; color: #ffffff; border-color: #38bdf8;
+      box-shadow: 0 0 10px rgba(2, 132, 199, 0.4);
     }
 
     .notice {
-      background: #172554; border: 1px solid #1e3a8a; border-radius: 10px;
-      padding: 12px; font-size: 12px; line-height: 1.6; color: #93c5fd; margin-bottom: 20px;
+      background: #172554; border: 1px solid #1e3a8a; border-radius: 8px;
+      padding: 10px; font-size: 12px; line-height: 1.6; color: #93c5fd; margin-bottom: 16px;
     }
 
-    .section-title { font-size: 15px; color: #f59e0b; margin-bottom: 12px; font-weight: bold; }
+    .section-title { font-size: 15px; color: #f59e0b; margin-bottom: 10px; font-weight: bold; }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
     .card {
       background: #1e293b; border: 1px solid #334155; border-radius: 10px;
-      padding: 12px; text-align: center;
+      padding: 12px 8px; text-align: center;
     }
     .badge {
       display: inline-block; font-size: 10px; background: rgba(239, 68, 68, 0.2);
-      color: #f87171; padding: 2px 6px; border-radius: 8px; margin-bottom: 4px;
+      color: #f87171; padding: 2px 6px; border-radius: 6px; margin-bottom: 5px;
     }
     .card-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
     .card-price { font-size: 15px; font-weight: bold; color: #38bdf8; margin-bottom: 8px; }
     .buy-btn {
       width: 100%; background: #0284c7; color: white; border: none;
-      padding: 8px 0; border-radius: 6px; font-weight: bold; cursor: pointer;
+      padding: 8px 0; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer;
     }
 
     /* Modal */
@@ -60,12 +61,12 @@
     .form-group { margin-bottom: 12px; }
     .form-group label { display: block; font-size: 12px; color: #cbd5e1; margin-bottom: 5px; }
     .form-group input {
-      width: 100%; padding: 10px; background: #0f172a; border: 1px solid #334155;
+      width: 100%; padding: 10px; background: #0b1329; border: 1px solid #334155;
       border-radius: 6px; color: white; font-size: 14px;
     }
 
     .payment-box {
-      background: #0f172a; border: 1px solid #334155; border-radius: 6px;
+      background: #0b1329; border: 1px solid #334155; border-radius: 6px;
       padding: 12px; margin-bottom: 15px; font-size: 12px; line-height: 1.6;
     }
 
@@ -84,8 +85,8 @@
 
   <!-- Currency Switcher -->
   <div class="currency-switch">
-    <button id="btn-mmk" class="currency-btn active" onclick="setCurrency('MMK')">🇲🇲 မြန်မာကျပ် (Ks)</button>
-    <button id="btn-thb" class="currency-btn" onclick="setCurrency('THB')">🇹🇭 ထိုင်းဘတ် (฿)</button>
+    <button id="btn-mmk" class="currency-btn active" onclick="switchCurrency('MMK')">🇲🇲 မြန်မာကျပ် (Ks)</button>
+    <button id="btn-thb" class="currency-btn" onclick="switchCurrency('THB')">🇹🇭 ထိုင်းဘတ် (฿)</button>
   </div>
 
   <div class="notice">
@@ -93,63 +94,13 @@
     ⚡ <b>ကြာမြင့်ချိန်:</b> အချိန်စောင့်စရာမလိုဘဲ တန်းရောက်ပါသည်။
   </div>
 
-  <!-- PASS & BUNDLE SECTION -->
+  <!-- Pass Section -->
   <div class="section-title">🔥 PASS & BUNDLE ပက်ကေ့ချ်များ</div>
-  <div class="grid">
-    <div class="card">
-      <span class="badge">အထူးတန်</span>
-      <div class="card-title">Weekly Diamond Pass</div>
-      <div class="card-price" id="price-pass1">7,000 Ks</div>
-      <button class="buy-btn" onclick="openOrder('Weekly Diamond Pass', 7000, 75)">ဝယ်ယူမည်</button>
-    </div>
-    <div class="card">
-      <span class="badge">Skin ရယူရန်</span>
-      <div class="card-title">Twilight Pass</div>
-      <div class="card-price" id="price-pass2">37,500 Ks</div>
-      <button class="buy-btn" onclick="openOrder('Twilight Pass', 37500, 395)">ဝယ်ယူမည်</button>
-    </div>
-    <div class="card">
-      <span class="badge">Bundle</span>
-      <div class="card-title">Weekly Elite Bundle</div>
-      <div class="card-price" id="price-pass3">3,800 Ks</div>
-      <button class="buy-btn" onclick="openOrder('Weekly Elite Bundle', 3800, 40)">ဝယ်ယူမည်</button>
-    </div>
-    <div class="card">
-      <span class="badge">Bundle</span>
-      <div class="card-title">Monthly Epic Bundle</div>
-      <div class="card-price" id="price-pass4">18,800 Ks</div>
-      <button class="buy-btn" onclick="openOrder('Monthly Epic Bundle', 18800, 200)">ဝယ်ယူမည်</button>
-    </div>
-  </div>
+  <div class="grid" id="pass-grid"></div>
 
-  <!-- DIAMONDS SECTION -->
+  <!-- Diamonds Section -->
   <div class="section-title">⚡ စိန်သီးသန့် (DIAMONDS)</div>
-  <div class="grid">
-    <div class="card">
-      <span class="badge">Direct</span>
-      <div class="card-title">86 Diamonds</div>
-      <div class="card-price" id="price-dia1">5,800 Ks</div>
-      <button class="buy-btn" onclick="openOrder('86 Diamonds', 5800, 60)">ဝယ်ယူမည်</button>
-    </div>
-    <div class="card">
-      <span class="badge">Direct</span>
-      <div class="card-title">172 Diamonds</div>
-      <div class="card-price" id="price-dia2">11,500 Ks</div>
-      <button class="buy-btn" onclick="openOrder('172 Diamonds', 11500, 120)">ဝယ်ယူမည်</button>
-    </div>
-    <div class="card">
-      <span class="badge">Direct</span>
-      <div class="card-title">257 Diamonds</div>
-      <div class="card-price" id="price-dia3">17,000 Ks</div>
-      <button class="buy-btn" onclick="openOrder('257 Diamonds', 17000, 180)">ဝယ်ယူမည်</button>
-    </div>
-    <div class="card">
-      <span class="badge">Direct</span>
-      <div class="card-title">706 Diamonds</div>
-      <div class="card-price" id="price-dia4">46,000 Ks</div>
-      <button class="buy-btn" onclick="openOrder('706 Diamonds', 46000, 480)">ဝယ်ယူမည်</button>
-    </div>
-  </div>
+  <div class="grid" id="diamond-grid"></div>
 
   <!-- Order Modal -->
   <div class="modal" id="orderModal">
@@ -165,4 +116,132 @@
       </div>
 
       <div style="display: flex; gap: 10px;">
-        <div class="form-group" style="flex:
+        <div class="form-group" style="flex: 2;">
+          <label>User ID</label>
+          <input type="number" id="userId" placeholder="12345678">
+        </div>
+        <div class="form-group" style="flex: 1;">
+          <label>Server ID</label>
+          <input type="number" id="zoneId" placeholder="1234">
+        </div>
+      </div>
+
+      <div class="payment-box" id="paymentDetails"></div>
+
+      <div class="form-group">
+        <label>ငွေလွှဲပြေစာ (စလစ်) ပုံရွေးပါ</label>
+        <input type="file" id="slipFile" accept="image/*">
+      </div>
+
+      <button class="submit-btn" id="btnSubmit" onclick="submitOrder()">ငွေလွှဲပြေစာ ပို့မည်</button>
+    </div>
+  </div>
+
+  <script>
+    const BOT_TOKEN = "8834166717:AAFfuD_ge9Xkfa48sp0iBaRXRpHALWaI5uk";
+    const ADMIN_CHAT_ID = "8863215122";
+
+    let currentCurrency = 'MMK';
+    let selectedPackage = null;
+
+    const passList = [
+      { name: "Weekly Diamond Pass", badge: "အထူးတန်", mmk: 7000, thb: 75 },
+      { name: "Twilight Pass", badge: "Skin ရယူရန်", mmk: 37500, thb: 395 },
+      { name: "Weekly Elite Bundle", badge: "Bundle", mmk: 3800, thb: 40 },
+      { name: "Monthly Epic Bundle", badge: "Bundle", mmk: 18800, thb: 200 }
+    ];
+
+    const diamondList = [
+      { name: "86 Diamonds", badge: "Direct", mmk: 5800, thb: 60 },
+      { name: "172 Diamonds", badge: "Direct", mmk: 11500, thb: 120 },
+      { name: "257 Diamonds", badge: "Direct", mmk: 17000, thb: 180 },
+      { name: "343 Diamonds", badge: "Direct", mmk: 23000, thb: 240 },
+      { name: "706 Diamonds", badge: "Direct", mmk: 46000, thb: 480 },
+      { name: "2195 Diamonds", badge: "Direct", mmk: 140000, thb: 1450 }
+    ];
+
+    function switchCurrency(curr) {
+      currentCurrency = curr;
+      document.getElementById('btn-mmk').className = (curr === 'MMK') ? 'currency-btn active' : 'currency-btn';
+      document.getElementById('btn-thb').className = (curr === 'THB') ? 'currency-btn active' : 'currency-btn';
+      renderPackages();
+    }
+
+    function renderPackages() {
+      // Render Passes
+      const passBox = document.getElementById('pass-grid');
+      let passHtml = '';
+      for (let i = 0; i < passList.length; i++) {
+        const item = passList[i];
+        const price = (currentCurrency === 'MMK') ? item.mmk.toLocaleString() + ' Ks' : item.thb.toLocaleString() + ' ฿';
+        passHtml += `
+          <div class="card">
+            <span class="badge">${item.badge}</span>
+            <div class="card-title">${item.name}</div>
+            <div class="card-price">${price}</div>
+            <button class="buy-btn" onclick="openOrder('pass', ${i})">ဝယ်ယူမည်</button>
+          </div>
+        `;
+      }
+      passBox.innerHTML = passHtml;
+
+      // Render Diamonds
+      const diaBox = document.getElementById('diamond-grid');
+      let diaHtml = '';
+      for (let i = 0; i < diamondList.length; i++) {
+        const item = diamondList[i];
+        const price = (currentCurrency === 'MMK') ? item.mmk.toLocaleString() + ' Ks' : item.thb.toLocaleString() + ' ฿';
+        diaHtml += `
+          <div class="card">
+            <span class="badge">${item.badge}</span>
+            <div class="card-title">${item.name}</div>
+            <div class="card-price">${price}</div>
+            <button class="buy-btn" onclick="openOrder('dia', ${i})">ဝယ်ယူမည်</button>
+          </div>
+        `;
+      }
+      diaBox.innerHTML = diaHtml;
+    }
+
+    function openOrder(type, index) {
+      selectedPackage = (type === 'pass') ? passList[index] : diamondList[index];
+      const priceText = (currentCurrency === 'MMK') ? selectedPackage.mmk.toLocaleString() + ' Ks' : selectedPackage.thb.toLocaleString() + ' ฿';
+      document.getElementById('selectedItemDisplay').value = selectedPackage.name + ' (' + priceText + ')';
+
+      const payBox = document.getElementById('paymentDetails');
+      if (currentCurrency === 'MMK') {
+        payBox.innerHTML = `
+          <b>🇲🇲 မြန်မာကျပ်ဖြင့် ငွေလွှဲရန် အကောင့်:</b><br>
+          • KPay / Wave: <b>09xxxxxxxxx</b> (ဦးဝန)<br>
+          ကျသင့်ငွေ: <b>${priceText}</b>
+        `;
+      } else {
+        payBox.innerHTML = `
+          <b>🇹🇭 ထိုင်းဘတ်ဖြင့် ငွေလွှဲရန် အကောင့်:</b><br>
+          • PromptPay / K-Bank: <b>08xxxxxxxx</b> (Phyo Wanna)<br>
+          ကျသင့်ငွေ: <b>${priceText}</b>
+        `;
+      }
+
+      document.getElementById('orderModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('orderModal').style.display = 'none';
+    }
+
+    async function submitOrder() {
+      const uid = document.getElementById('userId').value.trim();
+      const zone = document.getElementById('zoneId').value.trim();
+      const fileInput = document.getElementById('slipFile');
+
+      if (!uid || !zone) {
+        alert("User ID နှင့် Server ID ကို အပြည့်အစုံ ဖြည့်ပေးပါခင်ဗျာ။");
+        return;
+      }
+      if (!fileInput.files || fileInput.files.length === 0) {
+        alert("ငွေလွှဲပြေစာ (စလစ်) ပုံ ရွေးပေးပါခင်ဗျာ။");
+        return;
+      }
+
+      const submitBtn = document.getElementById('btnSubmit');
