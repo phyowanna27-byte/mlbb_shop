@@ -28,6 +28,7 @@
     .card button { background: #0284c7; color: white; border: none; padding: 8px; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 4px; }
     .card button:active { background: #0369a1; }
 
+    /* Modal Popup Form */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 100; justify-content: center; align-items: flex-start; padding: 16px; overflow-y: auto; }
     .modal-box { background: #1e293b; border: 1px solid #38bdf8; border-radius: 16px; width: 100%; max-width: 440px; padding: 18px; margin: auto 0; }
     .modal-box h3 { color: #38bdf8; font-size: 17px; margin-bottom: 4px; text-align: center; }
@@ -68,8 +69,8 @@
   </div>
 
   <div class="currency-switcher">
-    <button class="curr-btn active" id="btn-mmk" onclick="setCurrency('MMK')">🇲🇲 မြန်မာကျပ် (Ks)</button>
-    <button class="curr-btn" id="btn-thb" onclick="setCurrency('THB')">🇹🇭 ထိုင်းဘတ် (฿)</button>
+    <button class="curr-btn active" id="btn-mmk" onclick="changeCurrency('MMK')">🇲🇲 မြန်မာကျပ် (Ks)</button>
+    <button class="curr-btn" id="btn-thb" onclick="changeCurrency('THB')">🇹🇭 ထိုင်းဘတ် (฿)</button>
   </div>
 
   <div class="notice">
@@ -78,60 +79,39 @@
     <div class="warning">⚠️ အင်ဒို / မလေး / စင်ကာပူ / ဖိလစ်ပိုင် အကောင့်များအတွက် Admin ကို တိုက်ရိုက် ဆက်သွယ်ပေးပါ။</div>
   </div>
 
-  <div class="section-title">🔥 Pass & Bundle ပက်ကေ့ချ်များ</div>
-  <div class="grid" id="pass-container"></div>
-
-  <div class="section-title">⚡ စိန် ၂ ဆ (Double Diamonds)</div>
-  <div class="grid" id="double-container"></div>
-
-  <div class="section-title">💎 Diamonds တိုက်ရိုက်ဖြည့်သွင်းခြင်း</div>
-  <div class="grid" id="regular-container"></div>
-
-  <!-- Order & Payment Modal -->
-  <div class="modal-overlay" id="orderModal">
-    <div class="modal-box">
-      <h3 id="modalItemName">ပက်ကေ့ချ်</h3>
-      <div class="sub" id="modalItemPrice">စျေးနှုန်း</div>
-      
-      <div class="step-title">၁။ ဂိမ်းအကောင့် ID ထည့်ပါ</div>
-      <div style="display: flex; gap: 8px;">
-        <div class="form-group" style="flex: 1.5;">
-          <label>User ID</label>
-          <input type="number" id="userIdInput" placeholder="ဥပမာ: 12345678">
-        </div>
-        <div class="form-group" style="flex: 1;">
-          <label>Zone ID</label>
-          <input type="number" id="zoneIdInput" placeholder="ဥပမာ: 1234">
-        </div>
-      </div>
-
-      <div class="step-title">၂။ ငွေလွှဲရန် အကောင့်များ</div>
-      <div id="paymentAccountsContainer"></div>
-      <div class="rules-box" id="paymentRulesContainer"></div>
-
-      <div class="step-title">၃။ ငွေလွှဲပြေစာ (စလစ်) ပုံ တင်ပေးပါ</div>
-      <div class="file-input-wrapper" onclick="document.getElementById('slipInput').click()">
-        <input type="file" id="slipInput" accept="image/*" onchange="fileSelected(this)">
-        <div class="file-label">📸 စလစ်ဓာတ်ပုံ ရွေးချယ်ရန် နှိပ်ပါ</div>
-        <div class="file-name" id="fileNameDisplay">ပုံမရွေးရသေးပါ</div>
-      </div>
-
-      <div class="modal-btns">
-        <button class="btn-cancel" onclick="closeModal()">မလုပ်တော့ပါ</button>
-        <button class="btn-confirm" id="btnSubmitOrder" onclick="submitOrder()">အော်ဒါတင်မည်</button>
-      </div>
+  <!-- PASS SECTION -->
+  <div class="section-title">🔥 PASS & BUNDLE ပက်ကေ့ချ်များ</div>
+  <div class="grid">
+    <div class="card">
+      <div class="badge">အထူးတန်</div>
+      <div class="title">Weekly Diamond Pass</div>
+      <div class="price" id="p-wdp">7,000 Ks</div>
+      <button onclick="openModal('Weekly Diamond Pass')">ဝယ်ယူမည်</button>
+    </div>
+    <div class="card" id="card-twilight">
+      <div class="badge">Skin ရယူရန်</div>
+      <div class="title">Twilight Pass</div>
+      <div class="price" id="p-twilight">37,500 Ks</div>
+      <button onclick="openModal('Twilight Pass')">ဝယ်ယူမည်</button>
+    </div>
+    <div class="card" id="card-elite">
+      <div class="badge">Bundle</div>
+      <div class="title">Weekly Elite Bundle</div>
+      <div class="price" id="p-elite">3,800 Ks</div>
+      <button onclick="openModal('Weekly Elite Bundle')">ဝယ်ယူမည်</button>
+    </div>
+    <div class="card" id="card-epic">
+      <div class="badge">Bundle</div>
+      <div class="title">Monthly Epic Bundle</div>
+      <div class="price" id="p-epic">18,800 Ks</div>
+      <button onclick="openModal('Monthly Epic Bundle')">ဝယ်ယူမည်</button>
     </div>
   </div>
 
-  <script>
-    const BOT_TOKEN = "8834166717:AAFfuD_ge9Xkfa48sp0iBaRXRpHALWaI5uk";
-    const ADMIN_CHAT_ID = "8863215122";
-
-    var tg = null;
-    try {
-      if (window.Telegram && window.Telegram.WebApp) {
-        tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
-      }
-    
+  <!-- DOUBLE SECTION -->
+  <div class="section-title">⚡ စိန် ၂ ဆ (DOUBLE DIAMONDS)</div>
+  <div class="grid">
+    <div class="card">
+      <div class="badge">Double 2x</div>
+      <div class="title">50 + 50 Bonus 💎</div>
+      <div class="price" id="p-d50
