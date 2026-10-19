@@ -158,7 +158,7 @@
     let verifiedNickname = "";
     let checkTimeout = null;
 
-    // Google Sheets မှ ဒေတာ Live ရယူခြင်း
+    // Google Sheets မှ စျေးနှုန်းများကို Live ဆွဲယူခြင်း
     async function fetchPrices() {
       const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv`;
       try {
@@ -260,7 +260,6 @@
         `;
       }
 
-      // Reset ID and Nickname box
       document.getElementById('userId').value = '';
       document.getElementById('zoneId').value = '';
       const nickBox = document.getElementById('nicknameBox');
@@ -274,7 +273,7 @@
       document.getElementById('orderModal').style.display = 'none';
     }
 
-    // MLBB In-game Nickname စစ်ဆေးသည့် Function
+    // In-game Nickname စစ်ဆေးခြင်း
     function checkNickname() {
       const uid = document.getElementById('userId').value.trim();
       const zone = document.getElementById('zoneId').value.trim();
@@ -303,9 +302,9 @@
           } catch (e) {
             verifiedNickname = "";
             nickBox.className = 'nick-box error';
-            nickBox.innerText = '⚠️ ဂိမ်းနာမည် ရှာမတွေ့ပါ။ ID သေချာစစ်ဆေးပေးပါ။';
+            nickBox.innerText = '⚠️ ဂိမ်းနာမည် စစ်မရပါ။ ID သေချာစစ်ဆေးပေးပါ။';
           }
-        }, 500);
+        }, 400);
       } else {
         nickBox.style.display = 'none';
         verifiedNickname = "";
@@ -351,6 +350,7 @@
         nickText +
         `🆔 User ID : ${uid} (${zone})`;
 
+      // BUTTON_DATA_INVALID Error မတက်စေရန် စာလုံးတိုအောင် ထားရှိခြင်း
       const callbackData = `ok:${customerId}`;
 
       const replyMarkup = {
@@ -386,7 +386,6 @@
       }
     }
 
-    // စတင်ချိန်တွင် Google Sheet ဒေတာများကို ရယူပြသခြင်း
     fetchPrices();
   </script>
 </body>
