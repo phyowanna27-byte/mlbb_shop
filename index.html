@@ -3,115 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>May Lay Game Shop - MLBB Diamonds</title>
+  <title>May Lay Game Shop</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: #0f172a; color: #f8fafc; padding: 14px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-    .header { text-align: center; margin-bottom: 12px; width: 100%; max-width: 480px; }
-    .header h1 { font-size: 20px; font-weight: 700; color: #38bdf8; margin-bottom: 4px; }
-    .header p { font-size: 13px; color: #94a3b8; }
-
-    .currency-switcher { display: flex; background: #1e293b; border-radius: 12px; padding: 4px; margin-bottom: 14px; width: 100%; max-width: 480px; border: 1px solid #334155; }
-    .curr-btn { flex: 1; padding: 10px; border: none; background: transparent; color: #94a3b8; font-size: 13px; font-weight: 700; border-radius: 8px; cursor: pointer; transition: 0.2s; }
-    .curr-btn.active { background: #38bdf8; color: #0f172a; }
-
-    .notice { width: 100%; max-width: 480px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 8px; padding: 10px; font-size: 12px; color: #bae6fd; line-height: 1.5; margin-bottom: 14px; }
-    .warning { color: #f87171; font-weight: 600; margin-top: 4px; }
-
-    .section-title { width: 100%; max-width: 480px; font-size: 14px; font-weight: 700; color: #f59e0b; margin: 14px 0 8px 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; max-width: 480px; margin-bottom: 10px; }
-    .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 12px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; gap: 6px; }
-    .card .title { font-size: 13px; font-weight: 600; color: #f1f5f9; line-height: 1.3; }
-    .card .badge { display: inline-block; font-size: 10px; font-weight: 700; color: #ef4444; background: rgba(239, 68, 68, 0.15); padding: 2px 6px; border-radius: 4px; margin-bottom: 4px; align-self: center; }
-    .card .price { font-size: 14px; font-weight: 700; color: #38bdf8; }
-    .card button { background: #0284c7; color: white; border: none; padding: 8px; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 4px; }
-    .card button:active { background: #0369a1; }
-
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 100; justify-content: center; align-items: flex-start; padding: 16px; overflow-y: auto; }
-    .modal-box { background: #1e293b; border: 1px solid #38bdf8; border-radius: 16px; width: 100%; max-width: 440px; padding: 18px; margin: auto 0; }
-    .modal-box h3 { color: #38bdf8; font-size: 17px; margin-bottom: 4px; text-align: center; }
-    .modal-box .sub { font-size: 14px; color: #fbbf24; font-weight: 700; text-align: center; margin-bottom: 14px; }
-
-    .step-title { font-size: 13px; font-weight: 700; color: #38bdf8; margin: 12px 0 6px 0; }
-    .form-group { margin-bottom: 8px; }
-    .form-group label { display: block; font-size: 11px; color: #94a3b8; margin-bottom: 3px; font-weight: 600; }
-    .form-group input { width: 100%; padding: 9px 12px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: white; font-size: 13px; outline: none; }
-    .form-group input:focus { border-color: #38bdf8; }
-
-    .pay-card { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 10px; margin-bottom: 8px; }
-    .pay-header { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 700; margin-bottom: 4px; }
-    .pay-kpay { color: #3b82f6; }
-    .pay-wave { color: #eab308; }
-    .pay-bbl { color: #38bdf8; }
-    .pay-info { font-size: 12px; color: #cbd5e1; }
-    .btn-copy { background: #334155; color: #38bdf8; border: none; padding: 3px 8px; border-radius: 5px; font-size: 11px; cursor: pointer; }
-
-    .rules-box { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 9px; font-size: 11px; color: #fca5a5; line-height: 1.5; margin: 10px 0; }
+    body { background-color: #0f172a; color: #f8fafc; padding: 15px; padding-bottom: 50px; }
     
-    .file-input-wrapper { background: #0f172a; border: 1px dashed #475569; border-radius: 8px; padding: 12px; text-align: center; cursor: pointer; }
-    .file-input-wrapper input { display: none; }
-    .file-label { font-size: 12px; color: #38bdf8; font-weight: 600; cursor: pointer; }
-    .file-name { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+    .header { text-align: center; margin-bottom: 20px; }
+    .header h1 { font-size: 22px; color: #38bdf8; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .header p { font-size: 13px; color: #94a3b8; margin-top: 5px; }
 
-    .modal-btns { display: flex; gap: 8px; margin-top: 16px; }
-    .btn-cancel { flex: 1; padding: 11px; background: #334155; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; }
-    .btn-confirm { flex: 1.5; padding: 11px; background: #0284c7; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 13px; }
-    .btn-confirm:disabled { background: #475569; cursor: not-allowed; }
-  </style>
-</head>
-<body>
+    /* Currency Switcher */
+    .currency-switch { display: flex; gap: 10px; margin-bottom: 20px; }
+    .currency-btn {
+      flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #334155;
+      background: #1e293b; color: #94a3b8; font-size: 15px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .currency-btn.active {
+      background: #0284c7; color: #ffffff; border-color: #38bdf8;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+    }
 
-  <div class="header">
-    <h1>💎 May Lay Game Shop</h1>
-    <p>စိန် နှင့် ပက်ကေ့ချ်များ အမြန်ဖြည့်သွင်းရန်</p>
-  </div>
+    /* Notice Box */
+    .notice {
+      background: #172554; border: 1px solid #1e3a8a; border-radius: 10px;
+      padding: 12px; font-size: 12px; line-height: 1.6; color: #93c5fd; margin-bottom: 20px;
+    }
 
-  <div class="currency-switcher">
-    <button class="curr-btn active" id="btn-mmk" onclick="changeCurrency('MMK')">🇲🇲 မြန်မာကျပ် (Ks)</button>
-    <button class="curr-btn" id="btn-thb" onclick="changeCurrency('THB')">🇹🇭 ထိုင်းဘတ် (฿)</button>
-  </div>
+    /* Section Titles */
+    .section-title { font-size: 16px; color: #f59e0b; margin-bottom: 12px; font-weight: bold; }
 
-  <div class="notice">
-    📌 <b>လိုအပ်ချက်:</b> User ID + Zone ID (Server ID)<br>
-    ⏱ <b>ကြာမြင့်ချိန်:</b> အချိန်စောင့်စရာမလိုဘဲ တန်းရောက်ပါသည်။<br>
-    <div class="warning">⚠️ အင်ဒို / မလေး / စင်ကာပူ / ဖိလစ်ပိုင် အကောင့်များအတွက် Admin ကို တိုက်ရိုက် ဆက်သွယ်ပေးပါ။</div>
-  </div>
+    /* Package Grid */
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+    .card {
+      background: #1e293b; border: 1px solid #334155; border-radius: 12px;
+      padding: 12px; text-align: center; position: relative;
+    }
+    .badge {
+      display: inline-block; font-size: 10px; background: rgba(239, 68, 68, 0.2);
+      color: #f87171; padding: 2px 8px; border-radius: 12px; margin-bottom: 6px;
+    }
+    .card-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; height: 32px; display: flex; align-items: center; justify-content: center; }
+    .card-price { font-size: 15px; font-weight: bold; color: #38bdf8; margin-bottom: 10px; }
+    .buy-btn {
+      width: 100%; background: #0284c7; color: white; border: none;
+      padding: 8px 0; border-radius: 8px; font-weight: 600; cursor: pointer;
+    }
 
-  <!-- PASS SECTION -->
-  <div class="section-title">🔥 PASS & BUNDLE ပက်ကေ့ချ်များ</div>
-  <div class="grid">
-    <div class="card">
-      <div class="badge">အထူးတန်</div>
-      <div class="title">Weekly Diamond Pass</div>
-      <div class="price" id="p-wdp">7,000 Ks</div>
-      <button onclick="openModal('Weekly Diamond Pass', document.getElementById('p-wdp').innerText)">ဝယ်ယူမည်</button>
-    </div>
-    <div class="card" id="card-twilight">
-      <div class="badge">Skin ရယူရန်</div>
-      <div class="title">Twilight Pass</div>
-      <div class="price" id="p-twilight">37,500 Ks</div>
-      <button onclick="openModal('Twilight Pass', document.getElementById('p-twilight').innerText)">ဝယ်ယူမည်</button>
-    </div>
-    <div class="card" id="card-elite">
-      <div class="badge">Bundle</div>
-      <div class="title">Weekly Elite Bundle</div>
-      <div class="price" id="p-elite">3,800 Ks</div>
-      <button onclick="openModal('Weekly Elite Bundle', document.getElementById('p-elite').innerText)">ဝယ်ယူမည်</button>
-    </div>
-    <div class="card" id="card-epic">
-      <div class="badge">Bundle</div>
-      <div class="title">Monthly Epic Bundle</div>
-      <div class="price" id="p-epic">18,800 Ks</div>
-      <button onclick="openModal('Monthly Epic Bundle', document.getElementById('p-epic').innerText)">ဝယ်ယူမည်</button>
-    </div>
-  </div>
+    /* Modal / Form */
+    .modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px);
+      z-index: 100; justify-content: center; align-items: flex-end;
+    }
+    .modal-content {
+      background: #1e293b; width: 100%; max-height: 90vh; overflow-y: auto;
+      border-radius: 20px 20px 0 0; padding: 20px; border-top: 1px solid #475569;
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .close-btn { background: none; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; }
 
-  <!-- DOUBLE SECTION -->
-  <div class="section-title">⚡ စိန် ၂ ဆ (DOUBLE DIAMONDS)</div>
-  <div class="grid">
-    <div class="card">
-      <div class="badge">Double 2x</div>
-      <div class="title">50 + 50 Bonus 💎</div>
-      <div class="price" id="p-d50">3,800 Ks</div>
-      <button onclick="openModal('50 + 50 Bonus 💎', document.getElementById('p-d50').innerText)">ဝယ်ယူ
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 13px; color: #cbd5e1
