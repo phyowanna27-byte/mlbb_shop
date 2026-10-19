@@ -84,7 +84,7 @@
       cursor: pointer; margin-top: 5px; margin-bottom: 12px;
     }
 
-    /* Turbogaming-Style Account Card */
+    /* Account Card */
     .account-card {
       display: none; background: #0b1329; border: 1px solid #334155;
       border-radius: 10px; padding: 12px 14px; margin-bottom: 14px;
@@ -320,7 +320,6 @@
       document.getElementById('orderModal').style.display = 'none';
     }
 
-    // တိကျသေချာသော Account Check Function
     async function checkAccount() {
       const uid = document.getElementById('userId').value.trim();
       const zone = document.getElementById('zoneId').value.trim();
@@ -361,7 +360,6 @@
 
       card.className = 'account-card show';
 
-      // အကယ်၍ API မမိပါက သိရှိပြီးသား ID အတွက် default ချိတ်ပေးခြင်း
       if (foundName) {
         verifiedNickname = foundName;
       } else if (uid === "1472575847" && zone === "16142") {
@@ -420,7 +418,8 @@
         `🌐 Server : ${displayRegion}\n` +
         `🆔 Game ID : ${uid} (${zone})`;
 
-      const callbackData = `ok:${customerId}`;
+      // UID နှင့် Server ID ပါ ခလုတ် callback_data ထဲ တိုက်ရိုက် ထည့်သွင်းပေးခြင်း
+      const callbackData = `ok:${customerId}:${uid}(${zone})`;
 
       const replyMarkup = {
         inline_keyboard: [
