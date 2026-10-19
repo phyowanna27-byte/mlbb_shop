@@ -7,12 +7,14 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: linear-gradient(rgba(11, 19, 41, 0.82), rgba(11, 19, 41, 0.92)), url('banner.jpg.png') no-repeat center center fixed;
+    body {
+      background: linear-gradient(rgba(11, 19, 41, 0.85), rgba(11, 19, 41, 0.92)), url('banner.jpg.png') no-repeat center center fixed;
       background-size: cover;
       color: #f8fafc;
       padding: 15px;
       padding-bottom: 60px;
-      min-height: 100vh; }
+      min-height: 100vh;
+    }
     
     .header { text-align: center; margin-bottom: 16px; }
     .header h1 { font-size: 20px; color: #38bdf8; }
@@ -32,15 +34,16 @@
     }
 
     .notice {
-      background: #172554; border: 1px solid #1e3a8a; border-radius: 8px;
+      background: rgba(23, 37, 84, 0.8); border: 1px solid #1e3a8a; border-radius: 8px;
       padding: 10px 12px; font-size: 12px; line-height: 1.6; color: #93c5fd; margin-bottom: 16px;
     }
 
     .section-title { font-size: 15px; color: #f59e0b; margin: 15px 0 10px; font-weight: bold; }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
     .card {
-      background: #1e293b; border: 1px solid #334155; border-radius: 10px;
+      background: rgba(30, 41, 59, 0.85); border: 1px solid #334155; border-radius: 10px;
       padding: 12px 8px; text-align: center; display: flex; flex-direction: column; justify-content: space-between;
+      backdrop-filter: blur(4px);
     }
     .badge {
       display: inline-block; align-self: center; font-size: 10px; background: rgba(239, 68, 68, 0.2);
@@ -76,7 +79,7 @@
 
     /* Nickname Check Status */
     .nick-box {
-      font-size: 12px; margin-top: 4px; padding: 6px 10px; border-radius: 6px; display: none;
+      font-size: 12px; margin-top: 4px; padding: 8px 10px; border-radius: 6px; display: none;
     }
     .nick-box.success { display: block; background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #86efac; }
     .nick-box.error { display: block; background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #fca5a5; }
@@ -106,8 +109,8 @@
   </div>
 
   <div class="notice">
-    📌 <b>လိုအပ်ချက်:</b> User ID + Zone ID (Server ID)<br>
-    ⚡ <b>ကြာမြင့်ချိန်:</b> အချိန်စောင့်စရာမလိုဘဲ တန်းရောက်ပါသည်။
+    📌 <b>လိုအပ်ချက်:</b> User ID + Server ID ထည့်ပြီး နာမည်ပေါ်လာသည်အထိ စက္ကန့်အနည်းငယ် စောင့်ပါ<br>
+    ⚡ <b>ကြာမြင့်ချိန်:</b> စလစ်စစ်ဆေးပြီးပါက စိန်တန်းရောက်ပါမည်။
   </div>
 
   <div id="catalog-container">
@@ -149,6 +152,7 @@
       </div>
 
       <button class="submit-btn" id="btnSubmit" onclick="submitOrder()">ငွေလွှဲပြေစာ ပို့မည်</button>
+    </div>
   </div>
 
   <script>
@@ -162,7 +166,6 @@
     let verifiedNickname = "";
     let checkTimeout = null;
 
-    // Google Sheets မှ စျေးနှုန်းများကို Live ဆွဲယူခြင်း
     async function fetchPrices() {
       const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv`;
       try {
@@ -290,25 +293,42 @@
         nickBox.innerText = '🔍 ဂိမ်းနာမည် စစ်ဆေးနေပါသည်...';
 
         checkTimeout = setTimeout(async () => {
+          let foundName = "";
+
+          // CORS Proxy ဖြင့် စစ်ဆေးခြင်း
           try {
-            const res = await fetch(`https://api.isan.eu.org/nickname/ml?id=${uid}&zone=${zone}`);
-            const data = await res.json();
+            const targetUrl = `https://api.isan.eu.org/nickname/ml?id=${uid}&zone=${zone}`;
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+            const res = await fetch(proxyUrl);
+            const raw = await res.json();
+            const data = JSON.parse(raw.contents);
 
             if (data && data.success && data.name) {
-              verifiedNickname = decodeURIComponent(data.name);
-              nickBox.className = 'nick-box success';
-              nickBox.innerHTML = `✅ <b>ဂိမ်းနာမည်:</b> ${verifiedNickname}`;
-            } else {
-              verifiedNickname = "ရှာမတွေ့ပါ";
-              nickBox.className = 'nick-box error';
-              nickBox.innerText = '⚠️ ID သို့မဟုတ် Server ID မှားယွင်းနေပါသည်။';
+              foundName = decodeURIComponent(data.name);
             }
-          } catch (e) {
-            verifiedNickname = "စစ်ဆေးမရပါ";
-            nickBox.className = 'nick-box error';
-            nickBox.innerText = '⚠️ ဂိမ်းနာမည် စစ်မရပါ။ ID သေချာစစ်ဆေးပေးပါ။';
+          } catch(e) {}
+
+          // ဒုတိယ အရန်စနစ်ဖြင့် စစ်ဆေးခြင်း
+          if (!foundName) {
+            try {
+              const res2 = await fetch(`https://api.isan.eu.org/nickname/ml?id=${uid}&zone=${zone}`);
+              const data2 = await res2.json();
+              if (data2 && data2.success && data2.name) {
+                foundName = decodeURIComponent(data2.name);
+              }
+            } catch(e) {}
           }
-        }, 300);
+
+          if (foundName) {
+            verifiedNickname = foundName;
+            nickBox.className = 'nick-box success';
+            nickBox.innerHTML = `✅ <b>ဂိမ်းနာမည်:</b> ${verifiedNickname}`;
+          } else {
+            verifiedNickname = "";
+            nickBox.className = 'nick-box error';
+            nickBox.innerText = '⚠️ ဂိမ်းနာမည် ရှာမရပါ။ User ID နှင့် Server ID ကို ပြန်စစ်ပါ။';
+          }
+        }, 400);
       } else {
         nickBox.style.display = 'none';
         verifiedNickname = "";
@@ -345,7 +365,7 @@
         ? `${selectedItem.mmk.toLocaleString()} Ks` 
         : `${selectedItem.thb.toLocaleString()} ฿`;
 
-      const displayNick = verifiedNickname ? verifiedNickname : "မသိရသေးပါ";
+      const displayNick = verifiedNickname ? verifiedNickname : "စစ်ဆေးမရပါ";
 
       const caption = `🛒 အော်ဒါအသစ် ရောက်ရှိပါပြီ!\n\n` +
         `👤 ဝယ်သူ : ${customerName} (ID: ${customerId})\n` +
@@ -354,7 +374,6 @@
         `🎮 Nickname : ${displayNick}\n` +
         `🆔 User ID : ${uid} (${zone})`;
 
-      // BUTTON_DATA_INVALID Error မတက်စေရန် customerId သာ ထည့်သွင်းထားပါသည်
       const callbackData = `ok:${customerId}`;
 
       const replyMarkup = {
@@ -380,7 +399,7 @@
           closeModal();
           if (window.Telegram?.WebApp) window.Telegram.WebApp.close();
         } else {
-          alert("Error: " + res.description);
+          alert("Telegram Error: " + res.description);
         }
       } catch (err) {
         alert("လိုင်းအမှားဖြစ်ပေါ်ပါသည်: " + err.message);
