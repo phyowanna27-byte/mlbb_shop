@@ -321,7 +321,7 @@
       document.getElementById('orderModal').style.display = 'none';
     }
 
-    // Turbogaming ပုံစံ အကောင့်စစ်ဆေးခြင်း
+    // Turbogaming ပုံစံ နာမည် + ဆာဗာ တိုက်ရိုက်စစ်ဆေးခြင်း
     async function checkAccount() {
       const uid = document.getElementById('userId').value.trim();
       const zone = document.getElementById('zoneId').value.trim();
@@ -339,29 +339,37 @@
       btn.disabled = true;
       btn.innerText = "စစ်ဆေးနေပါသည်...";
 
+      verifiedServerRegion = detectRegionFallback(zone);
       let foundName = "";
-      let foundRegion = detectRegionFallback(zone);
 
-      // စနစ် ၁: YanJie API (CORS Bypass ဖြင့်) - နိုင်ငံပါ တိုက်ရိုက်ပြန်ပေးသော စနစ်
+      // လမ်းကြောင်း ၁: Codetabs CORS Proxy + Sanzy API
       try {
-        const targetUrl = `https://yanjiestore.com/submitt.php?ID=${uid}&server=${zone}`;
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
-        const res = await fetch(proxyUrl);
-        const raw = await res.json();
-        const data = JSON.parse(raw.contents);
-        if (data && (data.name || data.username || data.nickname)) {
-          foundName = data.name || data.username || data.nickname;
-          if (data.country || data.region) foundRegion = data.country || data.region;
+        const target = `https://api.sanzy.co/api/check-ml?id=${uid}&zone=${zone}`;
+        const res = await fetch(`https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(target)}`);
+        const data = await res.json();
+        if (data && (data.name || data.nickname || data.result)) {
+          foundName = data.name || data.nickname || data.result;
         }
       } catch(e) {}
 
-      // စနစ် ၂: Isan Direct API
+      // လမ်းကြောင်း ၂: Corsproxy.io + Isan API
       if (!foundName) {
         try {
-          const res2 = await fetch(`https://api.isan.eu.org/nickname/ml?id=${uid}&zone=${zone}`);
+          const res2 = await fetch(`https://corsproxy.io/?${encodeURIComponent('https://api.isan.eu.org/nickname/ml?id=' + uid + '&zone=' + zone)}`);
           const data2 = await res2.json();
           if (data2 && data2.success && data2.name) {
             foundName = decodeURIComponent(data2.name);
+          }
+        } catch(e) {}
+      }
+
+      // လမ်းကြောင်း ၃: Direct Fallback
+      if (!foundName) {
+        try {
+          const res3 = await fetch(`https://api.isan.eu.org/nickname/ml?id=${uid}&zone=${zone}`);
+          const data3 = await res3.json();
+          if (data3 && data3.success && data3.name) {
+            foundName = decodeURIComponent(data3.name);
           }
         } catch(e) {}
       }
@@ -370,15 +378,12 @@
 
       if (foundName) {
         verifiedNickname = foundName;
-        verifiedServerRegion = foundRegion;
         statusH.innerText = "✅ Account Found";
         statusH.style.color = "#22c55e";
         nickVal.innerText = verifiedNickname;
         regVal.innerText = verifiedServerRegion;
       } else {
-        // အကယ်၍ API မမိရင်တောင် Server ID အတိုင်း Region ကို ဖော်ပြပေးခြင်း
         verifiedNickname = "အမည်စစ်မရပါ";
-        verifiedServerRegion = foundRegion;
         statusH.innerText = "⚠️ Account Not Verified";
         statusH.style.color = "#f59e0b";
         nickVal.innerText = "အမည်စစ်မရပါ (ID မှန်ပါက ဆက်တင်နိုင်ပါသည်)";
