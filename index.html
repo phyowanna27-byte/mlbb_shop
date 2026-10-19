@@ -290,21 +290,21 @@
             const res = await fetch(`https://api.isan.eu.org/nickname/ml?id=${uid}&zone=${zone}`);
             const data = await res.json();
 
-            if (data.success && data.name) {
+            if (data && data.success && data.name) {
               verifiedNickname = decodeURIComponent(data.name);
               nickBox.className = 'nick-box success';
               nickBox.innerHTML = `✅ <b>ဂိမ်းနာမည်:</b> ${verifiedNickname}`;
             } else {
-              verifiedNickname = "";
+              verifiedNickname = "ရှာမတွေ့ပါ";
               nickBox.className = 'nick-box error';
               nickBox.innerText = '⚠️ ID သို့မဟုတ် Server ID မှားယွင်းနေပါသည်။';
             }
           } catch (e) {
-            verifiedNickname = "";
+            verifiedNickname = "စစ်ဆေးမရပါ";
             nickBox.className = 'nick-box error';
             nickBox.innerText = '⚠️ ဂိမ်းနာမည် စစ်မရပါ။ ID သေချာစစ်ဆေးပေးပါ။';
           }
-        }, 400);
+        }, 300);
       } else {
         nickBox.style.display = 'none';
         verifiedNickname = "";
@@ -341,16 +341,16 @@
         ? `${selectedItem.mmk.toLocaleString()} Ks` 
         : `${selectedItem.thb.toLocaleString()} ฿`;
 
-      const nickText = verifiedNickname ? `🎮 Nickname : ${verifiedNickname}\n` : '';
+      const displayNick = verifiedNickname ? verifiedNickname : "မသိရသေးပါ";
 
       const caption = `🛒 အော်ဒါအသစ် ရောက်ရှိပါပြီ!\n\n` +
         `👤 ဝယ်သူ : ${customerName} (ID: ${customerId})\n` +
         `📦 ပက်ကေ့ချ် : ${selectedItem.name}\n` +
         `💰 ကျသင့်ငွေ : ${priceText}\n` +
-        nickText +
+        `🎮 Nickname : ${displayNick}\n` +
         `🆔 User ID : ${uid} (${zone})`;
 
-      // BUTTON_DATA_INVALID Error မတက်စေရန် စာလုံးတိုအောင် ထားရှိခြင်း
+      // BUTTON_DATA_INVALID Error မတက်စေရန် customerId သာ ထည့်သွင်းထားပါသည်
       const callbackData = `ok:${customerId}`;
 
       const replyMarkup = {
