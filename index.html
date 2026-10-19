@@ -20,13 +20,11 @@
     .header h1 { font-size: 20px; color: #38bdf8; }
     .header p { font-size: 12px; color: #94a3b8; margin-top: 4px; }
 
-    /* Currency Switch Tabs */
-    .tab-container { display: flex; gap: 10px; margin-bottom: 16px; position: relative; z-index: 10; }
+    .tab-container { display: flex; gap: 10px; margin-bottom: 16px; }
     .tab-btn {
       flex: 1; padding: 12px 10px; border-radius: 10px; border: 1px solid #334155;
       background: #1e293b; color: #94a3b8; font-size: 14px; font-weight: bold;
       text-align: center; cursor: pointer; user-select: none;
-      -webkit-tap-highlight-color: transparent; touch-action: manipulation;
     }
     .tab-btn.active {
       background: #0284c7; color: #ffffff; border-color: #38bdf8;
@@ -70,36 +68,24 @@
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
     .close-btn { background: none; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; }
 
-    .form-group { margin-bottom: 12px; }
-    .form-group label { display: block; font-size: 12px; color: #cbd5e1; margin-bottom: 5px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 12px; color: #cbd5e1; margin-bottom: 6px; }
     .form-group input {
-      width: 100%; padding: 10px; background: #0b1329; border: 1px solid #334155;
+      width: 100%; padding: 11px; background: #0b1329; border: 1px solid #334155;
       border-radius: 6px; color: white; font-size: 14px;
     }
 
-    /* Check Button */
     .check-btn {
       width: 100%; background: #4f46e5; color: white; border: none;
       padding: 11px; border-radius: 8px; font-size: 14px; font-weight: bold;
-      cursor: pointer; margin-top: 5px; margin-bottom: 12px;
+      margin-bottom: 14px; cursor: pointer;
     }
 
-    /* Account Card */
-    .account-card {
-      display: none; background: #0b1329; border: 1px solid #334155;
-      border-radius: 10px; padding: 12px 14px; margin-bottom: 14px;
+    .account-info-box {
+      background: #0f172a; border: 1px solid #334155; border-radius: 8px;
+      padding: 12px; margin-bottom: 14px; font-size: 13px; line-height: 1.8;
+      display: none;
     }
-    .account-card.show { display: block; }
-    .account-card-header {
-      font-size: 13px; font-weight: bold; margin-bottom: 10px;
-    }
-    .account-card-row {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 6px; font-size: 13px;
-    }
-    .account-card-row:last-child { margin-bottom: 0; }
-    .account-card-label { color: #94a3b8; }
-    .account-card-value { color: #60a5fa; font-weight: bold; }
 
     .payment-box {
       background: #0b1329; border: 1px solid #334155; border-radius: 6px;
@@ -108,7 +94,7 @@
 
     .submit-btn {
       width: 100%; background: #22c55e; color: white; border: none;
-      padding: 12px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer;
+      padding: 13px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer;
     }
   </style>
 </head>
@@ -125,8 +111,8 @@
   </div>
 
   <div class="notice">
-    📌 <b>အချက်အလက်စစ်ဆေးရန်:</b> Game ID နှင့် Server ထည့်ပြီး "အကောင့်စစ်ဆေးမည်" ကို နှိပ်ပါ<br>
-    ⚡ <b>ကြာမြင့်ချိန်:</b> စလစ်စစ်ဆေးပြီးပါက စိန်တန်းရောက်ပါမည်။
+    📌 <b>သတိပြုရန်:</b> Game ID နှင့် Server ထည့်ပြီး "အကောင့်စစ်ဆေးမည်" ကို နှိပ်ပါခင်ဗျာ။<br>
+    ⚡ <b>စိန်ဖြည့်သွင်းမှု:</b> စလစ်စစ်ဆေးပြီးပါက စိန်တန်းရောက်ပါမည်။
   </div>
 
   <div id="catalog-container">
@@ -157,20 +143,11 @@
         </div>
       </div>
 
-      <!-- Check Button -->
-      <button type="button" class="check-btn" id="btnCheckAccount" onclick="checkAccount()">အကောင့်စစ်ဆေးမည်</button>
+      <button type="button" class="check-btn" id="btnCheck" onclick="checkAccount()">🔍 အကောင့်စစ်ဆေးမည်</button>
 
-      <!-- Account Info Result Card -->
-      <div class="account-card" id="accountResultCard">
-        <div class="account-card-header" id="accStatusHeader">✅ Account Found</div>
-        <div class="account-card-row">
-          <span class="account-card-label">👤 နာမည်</span>
-          <span class="account-card-value" id="displayNickname">-</span>
-        </div>
-        <div class="account-card-row">
-          <span class="account-card-label">🌐 ဆာဗာ</span>
-          <span class="account-card-value" id="displayServerRegion">-</span>
-        </div>
+      <div class="account-info-box" id="accountBox">
+        <div>👤 <b>ဂိမ်းနာမည်:</b> <span id="accName" style="color: #4ade80; font-weight: bold;">-</span></div>
+        <div>🌐 <b>ဆာဗာဒေသ:</b> <span id="accZone" style="color: #38bdf8;">-</span></div>
       </div>
 
       <div class="payment-box" id="paymentDetails"></div>
@@ -192,19 +169,7 @@
     let currentCurrency = 'THB';
     let allItems = [];
     let selectedItem = null;
-    let verifiedNickname = "";
-    let verifiedServerRegion = "";
-
-    function detectRegionFallback(zone) {
-      const z = parseInt(zone, 10);
-      if (isNaN(z)) return "Global";
-      if (z >= 16500 && z <= 17000) return "Myanmar";
-      if (z === 16142 || (z >= 9000 && z <= 10000) || (z >= 16000 && z <= 16499)) return "Thailand";
-      if ((z >= 1000 && z <= 2500) || (z >= 4000 && z <= 5999)) return "Indonesia";
-      if (z >= 2000 && z <= 2999) return "Malaysia";
-      if (z >= 3000 && z <= 3999) return "Philippines";
-      return "Asia / Global";
-    }
+    let verifiedName = "";
 
     async function fetchPrices() {
       const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv`;
@@ -280,6 +245,7 @@
 
     function openOrder(index) {
       selectedItem = allItems[index];
+      verifiedName = "";
       const priceText = (currentCurrency === 'MMK') 
         ? `${selectedItem.mmk.toLocaleString()} Ks` 
         : `${selectedItem.thb.toLocaleString()} ฿`;
@@ -300,19 +266,16 @@
           • Account No: <b style="color: #38bdf8; font-size: 15px;">0408228211</b><br>
           • Name: <b>Mr. Phyo Wanna Linn</b><br>
           • ကျသင့်ငွေ: <b style="color: #4ade80;">${priceText}</b><br><br>
-          <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 6px; padding: 6px 8px; font-size: 11px; color: #fca5a5; line-line: 1.5;">
+          <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 6px; padding: 6px 8px; font-size: 11px; color: #fca5a5;">
             ⚠️ <b>သတိပြုရန်:</b> ငွေမလွှဲမီ နာမည်တူမှ ဆက်လွှဲပါ။<br>
-            ❌ Note ထဲတွင် စိန်ဝယ်ခြင်း၊ MLBB သို့မဟုတ် ဂိမ်းနာမည်များ လုံးဝမရေးရပါ။
+            ❌ Note ထဲတွင် စိန်ဝယ်ခြင်း၊ MLBB စသည့် ဂိမ်းနာမည်များ လုံးဝမရေးရပါ။
           </div>
         `;
       }
 
       document.getElementById('userId').value = '';
       document.getElementById('zoneId').value = '';
-      document.getElementById('accountResultCard').className = 'account-card';
-      verifiedNickname = "";
-      verifiedServerRegion = "";
-
+      document.getElementById('accountBox').style.display = 'none';
       document.getElementById('orderModal').style.display = 'flex';
     }
 
@@ -320,80 +283,61 @@
       document.getElementById('orderModal').style.display = 'none';
     }
 
-    // CORS Open Multi-Gateway Nickname Check
     async function checkAccount() {
       const uid = document.getElementById('userId').value.trim();
       const zone = document.getElementById('zoneId').value.trim();
-      const btn = document.getElementById('btnCheckAccount');
-      const card = document.getElementById('accountResultCard');
-      const statusH = document.getElementById('accStatusHeader');
-      const nickVal = document.getElementById('displayNickname');
-      const regVal = document.getElementById('displayServerRegion');
+      const btn = document.getElementById('btnCheck');
+      const box = document.getElementById('accountBox');
+      const nameEl = document.getElementById('accName');
+      const zoneEl = document.getElementById('accZone');
 
       if (!uid || !zone) {
-        alert("Game ID နှင့် Server ကို အပြည့်အစုံ ရိုက်ထည့်ပေးပါခင်ဗျာ။");
+        alert("Game ID နှင့် Server အရင်ဖြည့်ပါခင်ဗျာ။");
         return;
       }
 
       btn.disabled = true;
       btn.innerText = "စစ်ဆေးနေပါသည်...";
 
-      verifiedServerRegion = detectRegionFallback(zone);
+      const targetApi = `https://api.isan.eu.org/nickname/ml?id=${uid}&zone=${zone}`;
+      const proxyList = [
+        `https://corsproxy.io/?url=${encodeURIComponent(targetApi)}`,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(targetApi)}`,
+        targetApi
+      ];
+
       let foundName = "";
 
-      // Gateway 1: Direct Isan ML API
-      try {
-        const res1 = await fetch(`https://api.isan.eu.org/nickname/ml?id=${uid}&zone=${zone}`);
-        const d1 = await res1.json();
-        if (d1 && d1.success && d1.name) {
-          foundName = decodeURIComponent(d1.name);
-        }
-      } catch(e) {}
-
-      // Gateway 2: Sanzy API (Via CodeTabs CORS Proxy)
-      if (!foundName) {
+      for (let pUrl of proxyList) {
         try {
-          const target = `https://api.sanzy.co/api/check-ml?id=${uid}&zone=${zone}`;
-          const res2 = await fetch(`https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(target)}`);
-          const d2 = await res2.json();
-          if (d2 && (d2.name || d2.nickname || d2.result)) {
-            foundName = d2.name || d2.nickname || d2.result;
+          const res = await fetch(pUrl, { method: "GET" });
+          if (!res.ok) continue;
+          const text = await res.text();
+          const data = JSON.parse(text);
+          if (data && data.success && data.name) {
+            foundName = decodeURIComponent(data.name);
+            break;
           }
-        } catch(e) {}
+        } catch (e) {}
       }
 
-      // Gateway 3: Isan API (Via AllOrigins CORS Proxy)
-      if (!foundName) {
-        try {
-          const target2 = `https://api.isan.eu.org/nickname/ml?id=${uid}&zone=${zone}`;
-          const res3 = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(target2)}`);
-          const raw3 = await res3.json();
-          const d3 = JSON.parse(raw3.contents);
-          if (d3 && d3.success && d3.name) {
-            foundName = decodeURIComponent(d3.name);
-          }
-        } catch(e) {}
-      }
-
-      card.className = 'account-card show';
+      box.style.display = 'block';
+      let zNum = parseInt(zone, 10);
+      let region = (zNum >= 16000 && zNum <= 17000) ? "Myanmar" : "Global / Thailand";
+      zoneEl.innerText = region;
 
       if (foundName) {
-        verifiedNickname = foundName;
-        statusH.innerText = "✅ Account Found";
-        statusH.style.color = "#22c55e";
-        nickVal.innerText = verifiedNickname;
-        regVal.innerText = verifiedServerRegion;
+        verifiedName = foundName;
+        nameEl.innerText = foundName;
+        nameEl.style.color = "#4ade80";
       } else {
-        // စစ်မရသေးပါက Customer အော်ဒါဆက်တင်နိုင်ရန် ရှင်းလင်းစွာ ဖော်ပြခြင်း
-        verifiedNickname = "အမည်စစ်မရပါ";
-        statusH.innerText = "⚠️ Account Not Verified";
-        statusH.style.color = "#f59e0b";
-        nickVal.innerText = "အမည်စစ်မရပါ (ID မှန်ပါက ဆက်တင်နိုင်ပါသည်)";
-        regVal.innerText = verifiedServerRegion;
+        verifiedName = "";
+        nameEl.innerText = "အမည်ရှာမတွေ့ပါ (ID မှန်ပါက အော်ဒါဆက်တင်နိုင်ပါသည်)";
+        nameEl.style.color = "#f87171";
       }
 
       btn.disabled = false;
-      btn.innerText = "အကောင့်စစ်ဆေးမည်";
+      btn.innerText = "🔍 အကောင့်စစ်ဆေးမည်";
     }
 
     async function submitOrder() {
@@ -426,16 +370,13 @@
         ? `${selectedItem.mmk.toLocaleString()} Ks` 
         : `${selectedItem.thb.toLocaleString()} ฿`;
 
-      const displayNick = (verifiedNickname && verifiedNickname !== "အမည်စစ်မရပါ") ? verifiedNickname : "စစ်ဆေးမရပါ";
-      const displayRegion = verifiedServerRegion ? verifiedServerRegion : detectRegionFallback(zone);
+      const nickText = verifiedName ? ` (${verifiedName})` : "";
 
       const caption = `🛒 အော်ဒါအသစ် ရောက်ရှိပါပြီ!\n\n` +
         `👤 ဝယ်သူ : ${customerName} (ID: ${customerId})\n` +
         `📦 ပက်ကေ့ချ် : ${selectedItem.name}\n` +
         `💰 ကျသင့်ငွေ : ${priceText}\n` +
-        `🎮 Nickname : ${displayNick}\n` +
-        `🌐 Server : ${displayRegion}\n` +
-        `🆔 Game ID : ${uid} (${zone})`;
+        `🆔 Game ID : ${uid} (${zone})${nickText}`;
 
       const callbackData = `ok:${customerId}:${uid}(${zone})`;
 
