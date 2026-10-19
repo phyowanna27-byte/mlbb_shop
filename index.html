@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>May Lay Game Shop</title>
+  <title>May Lay Game Store</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -13,14 +13,13 @@
     .header h1 { font-size: 20px; color: #38bdf8; }
     .header p { font-size: 12px; color: #94a3b8; margin-top: 4px; }
 
-    /* Currency Tabs (Touch Fix) */
-    .tab-container { display: flex; gap: 10px; margin-bottom: 16px; position: relative; z-index: 99; }
+    /* Currency Switch Tabs */
+    .tab-container { display: flex; gap: 10px; margin-bottom: 16px; position: relative; z-index: 10; }
     .tab-btn {
-      flex: 1; padding: 14px 10px; border-radius: 10px; border: 1px solid #334155;
+      flex: 1; padding: 12px 10px; border-radius: 10px; border: 1px solid #334155;
       background: #1e293b; color: #94a3b8; font-size: 14px; font-weight: bold;
       text-align: center; cursor: pointer; user-select: none;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent; touch-action: manipulation;
     }
     .tab-btn.active {
       background: #0284c7; color: #ffffff; border-color: #38bdf8;
@@ -29,17 +28,17 @@
 
     .notice {
       background: #172554; border: 1px solid #1e3a8a; border-radius: 8px;
-      padding: 10px; font-size: 12px; line-height: 1.6; color: #93c5fd; margin-bottom: 16px;
+      padding: 10px 12px; font-size: 12px; line-height: 1.6; color: #93c5fd; margin-bottom: 16px;
     }
 
-    .section-title { font-size: 15px; color: #f59e0b; margin-bottom: 10px; font-weight: bold; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+    .section-title { font-size: 15px; color: #f59e0b; margin: 15px 0 10px; font-weight: bold; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
     .card {
       background: #1e293b; border: 1px solid #334155; border-radius: 10px;
-      padding: 12px 8px; text-align: center;
+      padding: 12px 8px; text-align: center; display: flex; flex-direction: column; justify-content: space-between;
     }
     .badge {
-      display: inline-block; font-size: 10px; background: rgba(239, 68, 68, 0.2);
+      display: inline-block; align-self: center; font-size: 10px; background: rgba(239, 68, 68, 0.2);
       color: #f87171; padding: 2px 6px; border-radius: 6px; margin-bottom: 5px;
     }
     .card-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
@@ -49,7 +48,9 @@
       padding: 10px 0; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer;
     }
 
-    /* Modal Form */
+    .loading-box { text-align: center; color: #94a3b8; padding: 25px 10px; font-size: 14px; }
+
+    /* Order Form Modal */
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0, 0, 0, 0.75); z-index: 1000; justify-content: center; align-items: flex-end;
@@ -82,14 +83,13 @@
 <body>
 
   <div class="header">
-    <h1>💎 May Lay Game Shop</h1>
-    <p>စိန်နှင့် ပက်ကေ့ချ်များ အမြန်ဖြည့်သွင်းရန်</p>
+    <h1>💎 May Lay Game Store</h1>
+    <p>MLBB စိန်နှင့် ပက်ကေ့ချ်များ အမြန်ဖြည့်သွင်းရန်</p>
   </div>
 
-  <!-- Currency Switch Buttons -->
   <div class="tab-container">
-    <div id="btn-mmk" class="tab-btn active" onclick="switchCurrency('MMK')">🇲🇲 မြန်မာကျပ် (Ks)</div>
-    <div id="btn-thb" class="tab-btn" onclick="switchCurrency('THB')">🇹🇭 ထိုင်းဘတ် (฿)</div>
+    <div id="btn-thb" class="tab-btn active" onclick="switchCurrency('THB')">🇹🇭 ထိုင်းဘတ် (฿)</div>
+    <div id="btn-mmk" class="tab-btn" onclick="switchCurrency('MMK')">🇲🇲 မြန်မာကျပ် (Ks)</div>
   </div>
 
   <div class="notice">
@@ -97,129 +97,15 @@
     ⚡ <b>ကြာမြင့်ချိန်:</b> အချိန်စောင့်စရာမလိုဘဲ တန်းရောက်ပါသည်။
   </div>
 
-  <!-- ==================== MMK VIEW ==================== -->
-  <div id="view-mmk">
-    <div class="section-title">🔥 PASS & BUNDLE (MMK)</div>
-    <div class="grid">
-      <div class="card">
-        <span class="badge">အထူးတန်</span>
-        <div class="card-title">Weekly Diamond Pass</div>
-        <div class="card-price">7,000 Ks</div>
-        <button class="buy-btn" onclick="openOrder('Weekly Diamond Pass', '7,000 Ks', 'MMK')">ဝယ်ယူမည်</button>
-      </div>
-      <div class="card">
-        <span class="badge">Skin ရယူရန်</span>
-        <div class="card-title">Twilight Pass</div>
-        <div class="card-price">37,500 Ks</div>
-        <button class="buy-btn" onclick="openOrder('Twilight Pass', '37,500 Ks', 'MMK')">ဝယ်ယူမည်</button>
-      </div>
-      <div class="card">
-        <span class="badge">Bundle</span>
-        <div class="card-title">Weekly Elite Bundle</div>
-        <div class="card-price">3,800 Ks</div>
-        <button class="buy-btn" onclick="openOrder('Weekly Elite Bundle', '3,800 Ks', 'MMK')">ဝယ်ယူမည်</button>
-      </div>
-      <div class="card">
-        <span class="badge">Bundle</span>
-        <div class="card-title">Monthly Epic Bundle</div>
-        <div class="card-price">18,800 Ks</div>
-        <button class="buy-btn" onclick="openOrder('Monthly Epic Bundle', '18,800 Ks', 'MMK')">ဝယ်ယူမည်</button>
-      </div>
-    </div>
-
-    <div class="section-title">⚡ စိန်သီးသန့် DIAMONDS (MMK)</div>
-    <div class="grid">
-      <div class="card">
-        <span class="badge">Direct</span>
-        <div class="card-title">86 Diamonds</div>
-        <div class="card-price">5,800 Ks</div>
-        <button class="buy-btn" onclick="openOrder('86 Diamonds', '5,800 Ks', 'MMK')">ဝယ်ယူမည်</button>
-      </div>
-      <div class="card">
-        <span class="badge">Direct</span>
-        <div class="card-title">172 Diamonds</div>
-        <div class="card-price">11,500 Ks</div>
-        <button class="buy-btn" onclick="openOrder('172 Diamonds', '11,500 Ks', 'MMK')">ဝယ်ယူမည်</button>
-      </div>
-      <div class="card">
-        <span class="badge">Direct</span>
-        <div class="card-title">257 Diamonds</div>
-        <div class="card-price">17,000 Ks</div>
-        <button class="buy-btn" onclick="openOrder('257 Diamonds', '17,000 Ks', 'MMK')">ဝယ်ယူမည်</button>
-      </div>
-      <div class="card">
-        <span class="badge">Direct</span>
-        <div class="card-title">706 Diamonds</div>
-        <div class="card-price">46,000 Ks</div>
-        <button class="buy-btn" onclick="openOrder('706 Diamonds', '46,000 Ks', 'MMK')">ဝယ်ယူမည်</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== THB VIEW ==================== -->
-  <div id="view-thb" style="display: none;">
-    <div class="section-title">🔥 PASS & BUNDLE (THB)</div>
-    <div class="grid">
-      <div class="card">
-        <span class="badge">အထူးတန်</span>
-        <div class="card-title">Weekly Diamond Pass</div>
-        <div class="card-price">75 ฿</div>
-        <button class="buy-btn" onclick="openOrder('Weekly Diamond Pass', '75 ฿', 'THB')">ဝယ်ယူမည်</button>
-      </div>
-      <div class="card">
-        <span class="badge">Skin ရယူရန်</span>
-        <div class="card-title">Twilight Pass</div>
-        <div class="card-price">395 ฿</div>
-        <button class="buy-btn" onclick="openOrder('Twilight Pass', '395 ฿', 'THB')">ဝယ်ယူမည်</button>
-      </div>
-      <div class="card">
-        <span class="badge">Bundle</span>
-        <div class="card-title">Weekly Elite Bundle</div>
-        <div class="card-price">40 ฿</div>
-        <button class="buy-btn" onclick="openOrder('Weekly Elite Bundle', '40 ฿', 'THB')">ဝယ်ယူမည်</button>
-      </div>
-      <div class="card">
-        <span class="badge">Bundle</span>
-        <div class="card-title">Monthly Epic Bundle</div>
-        <div class="card-price">200 ฿</div>
-        <button class="buy-btn" onclick="openOrder('Monthly Epic Bundle', '200 ฿', 'THB')">ဝယ်ယူမည်</button>
-      </div>
-    </div>
-
-    <div class="section-title">⚡ စိန်သီးသန့် DIAMONDS (THB)</div>
-    <div class="grid">
-      <div class="card">
-        <span class="badge">Direct</span>
-        <div class="card-title">86 Diamonds</div>
-        <div class="card-price">60 ฿</div>
-        <button class="buy-btn" onclick="openOrder('86 Diamonds', '60 ฿', 'THB')">ဝယ်ယူမည်</button>
-      </div>
-      <div class="card">
-        <span class="badge">Direct</span>
-        <div class="card-title">172 Diamonds</div>
-        <div class="card-price">120 ฿</div>
-        <button class="buy-btn" onclick="openOrder('172 Diamonds', '120 ฿', 'THB')">ဝယ်ယူမည်</button>
-      </div>
-      <div class="card">
-        <span class="badge">Direct</span>
-        <div class="card-title">257 Diamonds</div>
-        <div class="card-price">180 ฿</div>
-        <button class="buy-btn" onclick="openOrder('257 Diamonds', '180 ฿', 'THB')">ဝယ်ယူမည်</button>
-      </div>
-      <div class="card">
-        <span class="badge">Direct</span>
-        <div class="card-title">706 Diamonds</div>
-        <div class="card-price">480 ฿</div>
-        <button class="buy-btn" onclick="openOrder('706 Diamonds', '480 ฿', 'THB')">ဝယ်ယူမည်</button>
-      </div>
-    </div>
+  <div id="catalog-container">
+    <div class="loading-box">စျေးနှုန်းစာရင်းများကို ရယူနေပါသည်...</div>
   </div>
 
   <!-- Order Modal -->
   <div class="modal" id="orderModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>အော်ဒါတင်ရန်</h3>
+        <h3>🛒 အော်ဒါတင်ရန်</h3>
         <button class="close-btn" onclick="closeModal()">&times;</button>
       </div>
 
@@ -231,11 +117,11 @@
       <div style="display: flex; gap: 10px;">
         <div class="form-group" style="flex: 2;">
           <label>User ID</label>
-          <input type="number" id="userId" placeholder="12345678">
+          <input type="number" id="userId" placeholder="ဥပမာ - 12345678">
         </div>
         <div class="form-group" style="flex: 1;">
           <label>Server ID</label>
-          <input type="number" id="zoneId" placeholder="1234">
+          <input type="number" id="zoneId" placeholder="ဥပမာ - 1234">
         </div>
       </div>
 
@@ -253,41 +139,112 @@
   <script>
     const BOT_TOKEN = "8834166717:AAFfuD_ge9Xkfa48sp0iBaRXRpHALWaI5uk";
     const ADMIN_CHAT_ID = "8863215122";
+    const SPREADSHEET_ID = "19Ryx-h258rS8duejpKA2Y0WoD2drx77CkFzc-6MYBbg";
 
-    let currentOrder = { name: '', price: '', currency: 'MMK' };
+    let currentCurrency = 'THB';
+    let allItems = [];
+    let selectedItem = null;
 
-    function switchCurrency(curr) {
-      const vMmk = document.getElementById('view-mmk');
-      const vThb = document.getElementById('view-thb');
-      const bMmk = document.getElementById('btn-mmk');
-      const bThb = document.getElementById('btn-thb');
-
-      if (curr === 'MMK') {
-        vMmk.style.display = 'block';
-        vThb.style.display = 'none';
-        bMmk.classList.add('active');
-        bThb.classList.remove('active');
-      } else {
-        vMmk.style.display = 'none';
-        vThb.style.display = 'block';
-        bThb.classList.add('active');
-        bMmk.classList.remove('active');
+    // Google Sheets မှ ဒေတာ Live ရယူခြင်း
+    async function fetchPrices() {
+      const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv`;
+      try {
+        const res = await fetch(url);
+        const text = await res.text();
+        const rows = text.split("\n").map(r => r.split(",").map(c => c.replace(/^["'](.*)["']$/, '$1').trim()));
+        
+        allItems = [];
+        for (let i = 1; i < rows.length; i++) {
+          const row = rows[i];
+          if (row.length >= 4 && row[1]) {
+            allItems.push({
+              category: row[0] || 'Diamonds',
+              name: row[1],
+              mmk: Number(row[2]) || 0,
+              thb: Number(row[3]) || 0,
+              badge: row[4] || ''
+            });
+          }
+        }
+        renderCatalog();
+      } catch (err) {
+        document.getElementById('catalog-container').innerHTML = 
+          '<div class="loading-box" style="color: #ef4444;">Google Sheet ဒေတာရယူ၍ မရနိုင်ပါ။ Sheet Access ကို "Anyone with the link" ပေးထားခြင်း ရှိမရှိ စစ်ဆေးပေးပါ။</div>';
       }
     }
 
-    function openOrder(name, price, currency) {
-      currentOrder = { name: name, price: price, currency: currency };
-      document.getElementById('selectedItemDisplay').value = name + ' (' + price + ')';
+    function switchCurrency(curr) {
+      currentCurrency = curr;
+      document.getElementById('btn-thb').className = (curr === 'THB') ? 'tab-btn active' : 'tab-btn';
+      document.getElementById('btn-mmk').className = (curr === 'MMK') ? 'tab-btn active' : 'tab-btn';
+      renderCatalog();
+    }
+
+    function renderCatalog() {
+      const container = document.getElementById('catalog-container');
+      const categories = {};
+
+      allItems.forEach((item, index) => {
+        const priceVal = (currentCurrency === 'MMK') ? item.mmk : item.thb;
+        if (priceVal <= 0) return; // 0 ဖြစ်နေသော ပစ္စည်းများကို မပြသပါ
+
+        if (!categories[item.category]) {
+          categories[item.category] = [];
+        }
+        categories[item.category].push({ ...item, originalIndex: index });
+      });
+
+      let fullHtml = '';
+      for (const catName in categories) {
+        fullHtml += `<div class="section-title">⚡ ${catName}</div><div class="grid">`;
+        categories[catName].forEach(item => {
+          const priceText = (currentCurrency === 'MMK') 
+            ? `${item.mmk.toLocaleString()} Ks` 
+            : `${item.thb.toLocaleString()} ฿`;
+
+          const badgeHtml = item.badge ? `<span class="badge">${item.badge}</span>` : '';
+          fullHtml += `
+            <div class="card">
+              ${badgeHtml}
+              <div class="card-title">${item.name}</div>
+              <div class="card-price">${priceText}</div>
+              <button class="buy-btn" onclick="openOrder(${item.originalIndex})">ဝယ်ယူမည်</button>
+            </div>
+          `;
+        });
+        fullHtml += `</div>`;
+      }
+
+      container.innerHTML = fullHtml || '<div class="loading-box">ရောင်းချရန် ပစ္စည်းမရှိသေးပါ။</div>';
+    }
+
+    function openOrder(index) {
+      selectedItem = allItems[index];
+      const priceText = (currentCurrency === 'MMK') 
+        ? `${selectedItem.mmk.toLocaleString()} Ks` 
+        : `${selectedItem.thb.toLocaleString()} ฿`;
+
+      document.getElementById('selectedItemDisplay').value = `${selectedItem.name} (${priceText})`;
 
       const payBox = document.getElementById('paymentDetails');
-      if (currency === 'MMK') {
-        payBox.innerHTML = '<b>🇲🇲 မြန်မာကျပ်ဖြင့် ငွေလွှဲရန် အကောင့်:</b><br>' +
-          '• KPay / Wave: <b>09xxxxxxxxx</b><br>' +
-          'ကျသင့်ငွေ: <b>' + price + '</b>';
+      if (currentCurrency === 'MMK') {
+        payBox.innerHTML = `
+          <b>🇲🇲 မြန်မာကျပ်ဖြင့် ငွေလွှဲရန် အကောင့်:</b><br>
+          • KPay / Wave: <b>ဆက်သွယ်မေးမြန်းပါ</b><br>
+          ကျသင့်ငွေ: <b style="color: #4ade80;">${priceText}</b>
+        `;
       } else {
-        payBox.innerHTML = '<b>🇹🇭 ထိုင်းဘတ်ဖြင့် ငွေလွှဲရန် အကောင့်:</b><br>' +
-          '• PromptPay / K-Bank: <b>08xxxxxxxx</b><br>' +
-          'ကျသင့်ငွေ: <b>' + price + '</b>';
+        payBox.innerHTML = `
+          <b>🇹🇭 ထိုင်းဘတ်ငွေလွှဲရန် အကောင့်:</b><br>
+          🏦 <b>Bangkok Bank (ဘန်ကောက်ဘဏ်)</b><br>
+          • Account No: <b style="color: #38bdf8; font-size: 15px;">0408228211</b><br>
+          • Name: <b>Mr. Phyo Wanna Linn</b><br>
+          • ကျသင့်ငွေ: <b style="color: #4ade80;">${priceText}</b><br><br>
+          <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 6px; padding: 6px 8px; font-size: 11px; color: #fca5a5; line-height: 1.5;">
+            ⚠️ <b>သတိပြုရန်:</b> ငွေမလွှဲမီ နာမည်တူမှ ဆက်လွှဲပါ။<br>
+            ❌ Note ထဲတွင် စိန်ဝယ်ခြင်း၊ MLBB သို့မဟုတ် ဂိမ်းနာမည်များ လုံးဝမရေးရပါ။
+          </div>
+        `;
       }
 
       document.getElementById('orderModal').style.display = 'flex';
@@ -318,18 +275,22 @@
       let customerId = "WebUser";
       let customerName = "Customer";
 
-      if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+      if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
         customerId = window.Telegram.WebApp.initDataUnsafe.user.id;
         customerName = window.Telegram.WebApp.initDataUnsafe.user.first_name || "Customer";
       }
 
-      const caption = "🛒 အော်ဒါအသစ် ရောက်ရှိပါပြီ!\n\n" +
-        "👤 Customer : " + customerName + " (ID: " + customerId + ")\n" +
-        "📦 ပက်ကေ့ချ် : " + currentOrder.name + "\n" +
-        "💰 ကျသင့်ငွေ : " + currentOrder.price + "\n" +
-        "🎮 User ID : " + uid + " (" + zone + ")";
+      const priceText = (currentCurrency === 'MMK') 
+        ? `${selectedItem.mmk.toLocaleString()} Ks` 
+        : `${selectedItem.thb.toLocaleString()} ฿`;
 
-      const callbackData = "ok:" + customerId + ":" + uid + "(" + zone + "):" + currentOrder.name;
+      const caption = `🛒 အော်ဒါအသစ် ရောက်ရှိပါပြီ!\n\n` +
+        `👤 ဝယ်သူ : ${customerName} (ID: ${customerId})\n` +
+        `📦 ပက်ကေ့ချ် : ${selectedItem.name}\n` +
+        `💰 ကျသင့်ငွေ : ${priceText}\n` +
+        `🎮 User ID : ${uid} (${zone})`;
+
+      const callbackData = `ok:${customerId}:${uid}(${zone}):${selectedItem.name}`;
 
       const replyMarkup = {
         inline_keyboard: [
@@ -344,7 +305,7 @@
       formData.append("reply_markup", JSON.stringify(replyMarkup));
 
       try {
-        const response = await fetch("https://api.telegram.org/bot" + BOT_TOKEN + "/sendPhoto", {
+        const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
           method: "POST",
           body: formData
         });
@@ -352,7 +313,7 @@
         if (res.ok) {
           alert("အော်ဒါတင်ခြင်း အောင်မြင်ပါသည်ခင်ဗျာ!");
           closeModal();
-          if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.close();
+          if (window.Telegram?.WebApp) window.Telegram.WebApp.close();
         } else {
           alert("Error: " + res.description);
         }
@@ -363,6 +324,9 @@
         submitBtn.innerText = "ငွေလွှဲပြေစာ ပို့မည်";
       }
     }
+
+    // စတင်ချိန်တွင် Google Sheet ဒေတာများကို ရယူပြသခြင်း
+    fetchPrices();
   </script>
 </body>
 </html>
