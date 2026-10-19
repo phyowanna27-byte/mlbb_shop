@@ -28,11 +28,110 @@
     .card button { background: #0284c7; color: white; border: none; padding: 8px; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 4px; }
     .card button:active { background: #0369a1; }
 
-    /* Modal Popup Form */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 100; justify-content: center; align-items: flex-start; padding: 16px; overflow-y: auto; }
     .modal-box { background: #1e293b; border: 1px solid #38bdf8; border-radius: 16px; width: 100%; max-width: 440px; padding: 18px; margin: auto 0; }
     .modal-box h3 { color: #38bdf8; font-size: 17px; margin-bottom: 4px; text-align: center; }
     .modal-box .sub { font-size: 14px; color: #fbbf24; font-weight: 700; text-align: center; margin-bottom: 14px; }
 
     .step-title { font-size: 13px; font-weight: 700; color: #38bdf8; margin: 12px 0 6px 0; }
-    .form-group
+    .form-group { margin-bottom: 8px; }
+    .form-group label { display: block; font-size: 11px; color: #94a3b8; margin-bottom: 3px; font-weight: 600; }
+    .form-group input { width: 100%; padding: 9px 12px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: white; font-size: 13px; outline: none; }
+    .form-group input:focus { border-color: #38bdf8; }
+
+    .pay-card { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 10px; margin-bottom: 8px; }
+    .pay-header { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+    .pay-kpay { color: #3b82f6; }
+    .pay-wave { color: #eab308; }
+    .pay-bbl { color: #38bdf8; }
+    .pay-info { font-size: 12px; color: #cbd5e1; }
+    .btn-copy { background: #334155; color: #38bdf8; border: none; padding: 3px 8px; border-radius: 5px; font-size: 11px; cursor: pointer; }
+
+    .rules-box { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 9px; font-size: 11px; color: #fca5a5; line-height: 1.5; margin: 10px 0; }
+    
+    .file-input-wrapper { background: #0f172a; border: 1px dashed #475569; border-radius: 8px; padding: 12px; text-align: center; cursor: pointer; }
+    .file-input-wrapper input { display: none; }
+    .file-label { font-size: 12px; color: #38bdf8; font-weight: 600; cursor: pointer; }
+    .file-name { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+
+    .modal-btns { display: flex; gap: 8px; margin-top: 16px; }
+    .btn-cancel { flex: 1; padding: 11px; background: #334155; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; }
+    .btn-confirm { flex: 1.5; padding: 11px; background: #0284c7; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 13px; }
+    .btn-confirm:disabled { background: #475569; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>💎 May Lay Game Shop</h1>
+    <p>စိန် နှင့် ပက်ကေ့ချ်များ အမြန်ဖြည့်သွင်းရန်</p>
+  </div>
+
+  <div class="currency-switcher">
+    <button class="curr-btn active" id="btn-mmk" onclick="setCurrency('MMK')">🇲🇲 မြန်မာကျပ် (Ks)</button>
+    <button class="curr-btn" id="btn-thb" onclick="setCurrency('THB')">🇹🇭 ထိုင်းဘတ် (฿)</button>
+  </div>
+
+  <div class="notice">
+    📌 <b>လိုအပ်ချက်:</b> User ID + Zone ID (Server ID)<br>
+    ⏱ <b>ကြာမြင့်ချိန်:</b> အချိန်စောင့်စရာမလိုဘဲ တန်းရောက်ပါသည်။<br>
+    <div class="warning">⚠️ အင်ဒို / မလေး / စင်ကာပူ / ဖိလစ်ပိုင် အကောင့်များအတွက် Admin ကို တိုက်ရိုက် ဆက်သွယ်ပေးပါ။</div>
+  </div>
+
+  <div class="section-title">🔥 Pass & Bundle ပက်ကေ့ချ်များ</div>
+  <div class="grid" id="pass-container"></div>
+
+  <div class="section-title">⚡ စိန် ၂ ဆ (Double Diamonds)</div>
+  <div class="grid" id="double-container"></div>
+
+  <div class="section-title">💎 Diamonds တိုက်ရိုက်ဖြည့်သွင်းခြင်း</div>
+  <div class="grid" id="regular-container"></div>
+
+  <!-- Order & Payment Modal -->
+  <div class="modal-overlay" id="orderModal">
+    <div class="modal-box">
+      <h3 id="modalItemName">ပက်ကေ့ချ်</h3>
+      <div class="sub" id="modalItemPrice">စျေးနှုန်း</div>
+      
+      <div class="step-title">၁။ ဂိမ်းအကောင့် ID ထည့်ပါ</div>
+      <div style="display: flex; gap: 8px;">
+        <div class="form-group" style="flex: 1.5;">
+          <label>User ID</label>
+          <input type="number" id="userIdInput" placeholder="ဥပမာ: 12345678">
+        </div>
+        <div class="form-group" style="flex: 1;">
+          <label>Zone ID</label>
+          <input type="number" id="zoneIdInput" placeholder="ဥပမာ: 1234">
+        </div>
+      </div>
+
+      <div class="step-title">၂။ ငွေလွှဲရန် အကောင့်များ</div>
+      <div id="paymentAccountsContainer"></div>
+      <div class="rules-box" id="paymentRulesContainer"></div>
+
+      <div class="step-title">၃။ ငွေလွှဲပြေစာ (စလစ်) ပုံ တင်ပေးပါ</div>
+      <div class="file-input-wrapper" onclick="document.getElementById('slipInput').click()">
+        <input type="file" id="slipInput" accept="image/*" onchange="fileSelected(this)">
+        <div class="file-label">📸 စလစ်ဓာတ်ပုံ ရွေးချယ်ရန် နှိပ်ပါ</div>
+        <div class="file-name" id="fileNameDisplay">ပုံမရွေးရသေးပါ</div>
+      </div>
+
+      <div class="modal-btns">
+        <button class="btn-cancel" onclick="closeModal()">မလုပ်တော့ပါ</button>
+        <button class="btn-confirm" id="btnSubmitOrder" onclick="submitOrder()">အော်ဒါတင်မည်</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BOT_TOKEN = "8834166717:AAFfuD_ge9Xkfa48sp0iBaRXRpHALWaI5uk";
+    const ADMIN_CHAT_ID = "8863215122";
+
+    var tg = null;
+    try {
+      if (window.Telegram && window.Telegram.WebApp) {
+        tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+      }
+    
