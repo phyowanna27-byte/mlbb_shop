@@ -77,15 +77,29 @@
       border-radius: 6px; color: white; font-size: 14px;
     }
 
-    /* Account Status Box */
-    .nick-box {
-      font-size: 13px; margin-top: 10px; padding: 10px 12px; border-radius: 8px; 
-      display: block; line-height: 1.6; background: rgba(15, 23, 42, 0.6);
-      border: 1px dashed #475569; color: #94a3b8;
+    /* Check Button */
+    .check-btn {
+      width: 100%; background: #4f46e5; color: white; border: none;
+      padding: 10px; border-radius: 8px; font-size: 14px; font-weight: bold;
+      cursor: pointer; margin-top: 5px; margin-bottom: 12px;
     }
-    .nick-box.success { background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #86efac; }
-    .nick-box.error { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #fca5a5; }
-    .nick-box.loading { background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #7dd3fc; }
+
+    /* Turbogaming-Style Account Card */
+    .account-card {
+      display: none; background: #0b1329; border: 1px solid #334155;
+      border-radius: 10px; padding: 12px 14px; margin-bottom: 14px;
+    }
+    .account-card.show { display: block; }
+    .account-card-header {
+      font-size: 13px; font-weight: bold; margin-bottom: 10px;
+    }
+    .account-card-row {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 6px; font-size: 13px;
+    }
+    .account-card-row:last-child { margin-bottom: 0; }
+    .account-card-label { color: #94a3b8; }
+    .account-card-value { color: #60a5fa; font-weight: bold; }
 
     .payment-box {
       background: #0b1329; border: 1px solid #334155; border-radius: 6px;
@@ -95,9 +109,6 @@
     .submit-btn {
       width: 100%; background: #22c55e; color: white; border: none;
       padding: 12px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer;
-    }
-    .submit-btn:disabled {
-      background: #475569; cursor: not-allowed; opacity: 0.7;
     }
   </style>
 </head>
@@ -114,7 +125,7 @@
   </div>
 
   <div class="notice">
-    📌 <b>အချက်အလက်ဖြည့်ရန်:</b> User ID နှင့် Server ID ထည့်ပါက နာမည်နှင့် ဆာဗာဒေသ တန်းပေါ်ပါမည်။<br>
+    📌 <b>အချက်အလက်စစ်ဆေးရန်:</b> Game ID နှင့် Server ထည့်ပြီး "အကောင့်စစ်ဆေးမည်" ကို နှိပ်ပါ<br>
     ⚡ <b>ကြာမြင့်ချိန်:</b> စလစ်စစ်ဆေးပြီးပါက စိန်တန်းရောက်ပါမည်။
   </div>
 
@@ -137,22 +148,32 @@
 
       <div style="display: flex; gap: 10px;">
         <div class="form-group" style="flex: 2;">
-          <label>User ID</label>
-          <input type="number" id="userId" placeholder="12345678" oninput="checkNickname()">
+          <label>Game ID (User ID)</label>
+          <input type="number" id="userId" placeholder="1472575847">
         </div>
         <div class="form-group" style="flex: 1;">
-          <label>Server ID</label>
-          <input type="number" id="zoneId" placeholder="1234" oninput="checkNickname()">
+          <label>Server</label>
+          <input type="number" id="zoneId" placeholder="16142">
         </div>
       </div>
 
-      <!-- In-game Nickname & Server Display Box -->
-      <div id="nicknameBox" class="nick-box">
-        🎮 <b>ဂိမ်းနာမည်:</b> (ID ရိုက်ထည့်ပါ)<br>
-        🌐 <b>ဆာဗာဒေသ:</b> (Server ID ရိုက်ထည့်ပါ)
+      <!-- Turbogaming Style Check Button -->
+      <button type="button" class="check-btn" id="btnCheckAccount" onclick="checkAccount()">အကောင့်စစ်ဆေးမည်</button>
+
+      <!-- Account Info Result Card -->
+      <div class="account-card" id="accountResultCard">
+        <div class="account-card-header" id="accStatusHeader">✅ Account Found</div>
+        <div class="account-card-row">
+          <span class="account-card-label">👤 နာမည်</span>
+          <span class="account-card-value" id="displayNickname">-</span>
+        </div>
+        <div class="account-card-row">
+          <span class="account-card-label">🌐 ဆာဗာ</span>
+          <span class="account-card-value" id="displayServerRegion">-</span>
+        </div>
       </div>
 
-      <div class="payment-box" id="paymentDetails" style="margin-top: 12px;"></div>
+      <div class="payment-box" id="paymentDetails"></div>
 
       <div class="form-group">
         <label>ငွေလွှဲပြေစာ (စလစ်) ပုံရွေးပါ</label>
@@ -173,21 +194,17 @@
     let selectedItem = null;
     let verifiedNickname = "";
     let verifiedServerRegion = "";
-    let checkTimeout = null;
 
-    // Server ID မှတစ်ဆင့် Server ဒေသ ခွဲခြမ်းသတ်မှတ်ခြင်း
-    function detectRegion(zone) {
+    // Server ID မှ Region အတိအကျ သတ်မှတ်ခြင်း (16142 = Thailand အစစ်)
+    function detectRegionFallback(zone) {
       const z = parseInt(zone, 10);
-      if (isNaN(z)) return "Global / အခြား";
-
-      if (z >= 16000 && z <= 17000) return "🇲🇲 Myanmar Server (မြန်မာ)";
-      if (z >= 1000 && z <= 2500) return "🇮🇩 Indonesia Server (အင်ဒို)";
-      if (z >= 9000 && z <= 10000) return "🇹🇭 Thailand Server (ထိုင်း)";
-      if (z >= 8000 && z <= 8999) return "🇲🇾 Malaysia Server (မလေး)";
-      if (z >= 3000 && z <= 3999) return "🇵🇭 Philippines Server (ဖိလစ်ပိုင်)";
-      if (z >= 6000 && z <= 6999) return "🇧🇷 Brazil Server (ဘရာဇီး)";
-      if (z >= 4000 && z <= 5999) return "🌍 Global / အခြား Server";
-      return "🌏 Asia / အခြား Server";
+      if (isNaN(z)) return "Global";
+      if (z === 16142 || (z >= 9000 && z <= 10000) || (z >= 16000 && z <= 16499)) return "Thailand";
+      if (z >= 16500 && z <= 17000) return "Myanmar";
+      if ((z >= 1000 && z <= 2500) || (z >= 4000 && z <= 5999)) return "Indonesia";
+      if (z >= 2000 && z <= 2999) return "Malaysia";
+      if (z >= 3000 && z <= 3999) return "Philippines";
+      return "Asia / Global";
     }
 
     async function fetchPrices() {
@@ -293,9 +310,7 @@
 
       document.getElementById('userId').value = '';
       document.getElementById('zoneId').value = '';
-      const nickBox = document.getElementById('nicknameBox');
-      nickBox.className = 'nick-box';
-      nickBox.innerHTML = '🎮 <b>ဂိမ်းနာမည်:</b> (ID ရိုက်ထည့်ပါ)<br>🌐 <b>ဆာဗာဒေသ:</b> (Server ID ရိုက်ထည့်ပါ)';
+      document.getElementById('accountResultCard').className = 'account-card';
       verifiedNickname = "";
       verifiedServerRegion = "";
 
@@ -306,64 +321,72 @@
       document.getElementById('orderModal').style.display = 'none';
     }
 
-    // Direct MLBB Nickname & Server Region Check
-    function checkNickname() {
+    // Turbogaming ပုံစံ အကောင့်စစ်ဆေးခြင်း
+    async function checkAccount() {
       const uid = document.getElementById('userId').value.trim();
       const zone = document.getElementById('zoneId').value.trim();
-      const nickBox = document.getElementById('nicknameBox');
+      const btn = document.getElementById('btnCheckAccount');
+      const card = document.getElementById('accountResultCard');
+      const statusH = document.getElementById('accStatusHeader');
+      const nickVal = document.getElementById('displayNickname');
+      const regVal = document.getElementById('displayServerRegion');
 
-      clearTimeout(checkTimeout);
-
-      if (uid.length >= 6 && zone.length >= 4) {
-        verifiedServerRegion = detectRegion(zone);
-        nickBox.className = 'nick-box loading';
-        nickBox.innerHTML = `🌐 <b>ဆာဗာဒေသ:</b> ${verifiedServerRegion}<br>🔍 ဂိမ်းနာမည် စစ်ဆေးနေပါသည်...`;
-
-        checkTimeout = setTimeout(async () => {
-          let foundName = "";
-
-          // API 1: Direct Isan ML Lookup
-          try {
-            const res = await fetch(`https://api.isan.eu.org/nickname/ml?id=${uid}&zone=${zone}`);
-            const data = await res.json();
-            if (data && data.success && data.name) {
-              foundName = decodeURIComponent(data.name);
-            }
-          } catch(e) {}
-
-          // API 2: Direct API Games (Backup)
-          if (!foundName) {
-            try {
-              const res2 = await fetch(`https://v1.apigames.id/merchant/M230303XXXX/cek-username/mobilelegend?user_id=${uid}${zone}`);
-              const data2 = await res2.json();
-              if (data2 && data2.data && data2.data.username) {
-                foundName = data2.data.username;
-              }
-            } catch(e) {}
-          }
-
-          if (foundName) {
-            verifiedNickname = foundName;
-            nickBox.className = 'nick-box success';
-            nickBox.innerHTML = `
-              🎮 <b>ဂိမ်းနာမည်:</b> <span style="font-size:14px; color:#4ade80;">${verifiedNickname}</span><br>
-              🌐 <b>ဆာဗာဒေသ:</b> <span style="color:#38bdf8;">${verifiedServerRegion}</span>
-            `;
-          } else {
-            verifiedNickname = "";
-            nickBox.className = 'nick-box error';
-            nickBox.innerHTML = `
-              🌐 <b>ဆာဗာဒေသ:</b> ${verifiedServerRegion}<br>
-              ⚠️ အမည်စစ်မရသေးပါ (ID မှန်ကန်ပါက အော်ဒါ ဆက်တင်နိုင်ပါသည်)
-            `;
-          }
-        }, 250);
-      } else {
-        nickBox.className = 'nick-box';
-        nickBox.innerHTML = '🎮 <b>ဂိမ်းနာမည်:</b> (ID ရိုက်ထည့်ပါ)<br>🌐 <b>ဆာဗာဒေသ:</b> (Server ID ရိုက်ထည့်ပါ)';
-        verifiedNickname = "";
-        verifiedServerRegion = "";
+      if (!uid || !zone) {
+        alert("Game ID နှင့် Server ကို အပြည့်အစုံ ရိုက်ထည့်ပေးပါခင်ဗျာ။");
+        return;
       }
+
+      btn.disabled = true;
+      btn.innerText = "စစ်ဆေးနေပါသည်...";
+
+      let foundName = "";
+      let foundRegion = detectRegionFallback(zone);
+
+      // စနစ် ၁: YanJie API (CORS Bypass ဖြင့်) - နိုင်ငံပါ တိုက်ရိုက်ပြန်ပေးသော စနစ်
+      try {
+        const targetUrl = `https://yanjiestore.com/submitt.php?ID=${uid}&server=${zone}`;
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+        const res = await fetch(proxyUrl);
+        const raw = await res.json();
+        const data = JSON.parse(raw.contents);
+        if (data && (data.name || data.username || data.nickname)) {
+          foundName = data.name || data.username || data.nickname;
+          if (data.country || data.region) foundRegion = data.country || data.region;
+        }
+      } catch(e) {}
+
+      // စနစ် ၂: Isan Direct API
+      if (!foundName) {
+        try {
+          const res2 = await fetch(`https://api.isan.eu.org/nickname/ml?id=${uid}&zone=${zone}`);
+          const data2 = await res2.json();
+          if (data2 && data2.success && data2.name) {
+            foundName = decodeURIComponent(data2.name);
+          }
+        } catch(e) {}
+      }
+
+      card.className = 'account-card show';
+
+      if (foundName) {
+        verifiedNickname = foundName;
+        verifiedServerRegion = foundRegion;
+        statusH.innerText = "✅ Account Found";
+        statusH.style.color = "#22c55e";
+        nickVal.innerText = verifiedNickname;
+        regVal.innerText = verifiedServerRegion;
+      } else {
+        // အကယ်၍ API မမိရင်တောင် Server ID အတိုင်း Region ကို ဖော်ပြပေးခြင်း
+        verifiedNickname = "အမည်စစ်မရပါ";
+        verifiedServerRegion = foundRegion;
+        statusH.innerText = "⚠️ Account Not Verified";
+        statusH.style.color = "#f59e0b";
+        nickVal.innerText = "အမည်စစ်မရပါ (ID မှန်ပါက ဆက်တင်နိုင်ပါသည်)";
+        regVal.innerText = verifiedServerRegion;
+      }
+
+      btn.disabled = false;
+      btn.innerText = "အကောင့်စစ်ဆေးမည်";
     }
 
     async function submitOrder() {
@@ -372,7 +395,7 @@
       const fileInput = document.getElementById('slipFile');
 
       if (!uid || !zone) {
-        alert("User ID နှင့် Server ID ကို အပြည့်အစုံ ဖြည့်ပေးပါခင်ဗျာ။");
+        alert("Game ID နှင့် Server ကို အပြည့်အစုံ ဖြည့်ပေးပါခင်ဗျာ။");
         return;
       }
       if (!fileInput.files || fileInput.files.length === 0) {
@@ -397,15 +420,15 @@
         : `${selectedItem.thb.toLocaleString()} ฿`;
 
       const displayNick = verifiedNickname ? verifiedNickname : "စစ်ဆေးမရပါ";
-      const displayRegion = verifiedServerRegion ? verifiedServerRegion : detectRegion(zone);
+      const displayRegion = verifiedServerRegion ? verifiedServerRegion : detectRegionFallback(zone);
 
       const caption = `🛒 အော်ဒါအသစ် ရောက်ရှိပါပြီ!\n\n` +
         `👤 ဝယ်သူ : ${customerName} (ID: ${customerId})\n` +
         `📦 ပက်ကေ့ချ် : ${selectedItem.name}\n` +
         `💰 ကျသင့်ငွေ : ${priceText}\n` +
         `🎮 Nickname : ${displayNick}\n` +
-        `🌐 Server ဒေသ : ${displayRegion}\n` +
-        `🆔 User ID : ${uid} (${zone})`;
+        `🌐 Server : ${displayRegion}\n` +
+        `🆔 Game ID : ${uid} (${zone})`;
 
       const callbackData = `ok:${customerId}`;
 
