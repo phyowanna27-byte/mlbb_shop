@@ -6,20 +6,21 @@
   <title>May Lay Game Shop</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: #0b1329; color: #f8fafc; padding: 15px; padding-bottom: 60px; }
     
     .header { text-align: center; margin-bottom: 16px; }
     .header h1 { font-size: 20px; color: #38bdf8; }
     .header p { font-size: 12px; color: #94a3b8; margin-top: 4px; }
 
-    /* Currency Switch */
-    .currency-switch { display: flex; gap: 10px; margin-bottom: 16px; }
-    .currency-btn {
+    /* Currency Tabs */
+    .tab-container { display: flex; gap: 10px; margin-bottom: 16px; }
+    .tab-btn {
       flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #334155;
-      background: #1e293b; color: #94a3b8; font-size: 14px; font-weight: bold; cursor: pointer;
+      background: #1e293b; color: #94a3b8; font-size: 14px; font-weight: bold;
+      text-align: center; cursor: pointer; user-select: none;
     }
-    .currency-btn.active {
+    .tab-btn.active {
       background: #0284c7; color: #ffffff; border-color: #38bdf8;
       box-shadow: 0 0 10px rgba(2, 132, 199, 0.4);
     }
@@ -46,7 +47,7 @@
       padding: 8px 0; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer;
     }
 
-    /* Modal */
+    /* Modal Form */
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0, 0, 0, 0.75); z-index: 1000; justify-content: center; align-items: flex-end;
@@ -83,10 +84,10 @@
     <p>စိန်နှင့် ပက်ကေ့ချ်များ အမြန်ဖြည့်သွင်းရန်</p>
   </div>
 
-  <!-- Currency Switcher -->
-  <div class="currency-switch">
-    <button id="btn-mmk" class="currency-btn active" onclick="switchCurrency('MMK')">🇲🇲 မြန်မာကျပ် (Ks)</button>
-    <button id="btn-thb" class="currency-btn" onclick="switchCurrency('THB')">🇹🇭 ထိုင်းဘတ် (฿)</button>
+  <!-- Currency Switch Buttons -->
+  <div class="tab-container">
+    <div id="btn-mmk" class="tab-btn active" onclick="switchCurrency('MMK')">🇲🇲 မြန်မာကျပ် (Ks)</div>
+    <div id="btn-thb" class="tab-btn" onclick="switchCurrency('THB')">🇹🇭 ထိုင်းဘတ် (฿)</div>
   </div>
 
   <div class="notice">
@@ -94,13 +95,123 @@
     ⚡ <b>ကြာမြင့်ချိန်:</b> အချိန်စောင့်စရာမလိုဘဲ တန်းရောက်ပါသည်။
   </div>
 
-  <!-- Pass Section -->
-  <div class="section-title">🔥 PASS & BUNDLE ပက်ကေ့ချ်များ</div>
-  <div class="grid" id="pass-grid"></div>
+  <!-- ==================== MMK VIEW ==================== -->
+  <div id="view-mmk">
+    <div class="section-title">🔥 PASS & BUNDLE (MMK)</div>
+    <div class="grid">
+      <div class="card">
+        <span class="badge">အထူးတန်</span>
+        <div class="card-title">Weekly Diamond Pass</div>
+        <div class="card-price">7,000 Ks</div>
+        <button class="buy-btn" onclick="openOrder('Weekly Diamond Pass', '7,000 Ks', 'MMK')">ဝယ်ယူမည်</button>
+      </div>
+      <div class="card">
+        <span class="badge">Skin ရယူရန်</span>
+        <div class="card-title">Twilight Pass</div>
+        <div class="card-price">37,500 Ks</div>
+        <button class="buy-btn" onclick="openOrder('Twilight Pass', '37,500 Ks', 'MMK')">ဝယ်ယူမည်</button>
+      </div>
+      <div class="card">
+        <span class="badge">Bundle</span>
+        <div class="card-title">Weekly Elite Bundle</div>
+        <div class="card-price">3,800 Ks</div>
+        <button class="buy-btn" onclick="openOrder('Weekly Elite Bundle', '3,800 Ks', 'MMK')">ဝယ်ယူမည်</button>
+      </div>
+      <div class="card">
+        <span class="badge">Bundle</span>
+        <div class="card-title">Monthly Epic Bundle</div>
+        <div class="card-price">18,800 Ks</div>
+        <button class="buy-btn" onclick="openOrder('Monthly Epic Bundle', '18,800 Ks', 'MMK')">ဝယ်ယူမည်</button>
+      </div>
+    </div>
 
-  <!-- Diamonds Section -->
-  <div class="section-title">⚡ စိန်သီးသန့် (DIAMONDS)</div>
-  <div class="grid" id="diamond-grid"></div>
+    <div class="section-title">⚡ စိန်သီးသန့် DIAMONDS (MMK)</div>
+    <div class="grid">
+      <div class="card">
+        <span class="badge">Direct</span>
+        <div class="card-title">86 Diamonds</div>
+        <div class="card-price">5,800 Ks</div>
+        <button class="buy-btn" onclick="openOrder('86 Diamonds', '5,800 Ks', 'MMK')">ဝယ်ယူမည်</button>
+      </div>
+      <div class="card">
+        <span class="badge">Direct</span>
+        <div class="card-title">172 Diamonds</div>
+        <div class="card-price">11,500 Ks</div>
+        <button class="buy-btn" onclick="openOrder('172 Diamonds', '11,500 Ks', 'MMK')">ဝယ်ယူမည်</button>
+      </div>
+      <div class="card">
+        <span class="badge">Direct</span>
+        <div class="card-title">257 Diamonds</div>
+        <div class="card-price">17,000 Ks</div>
+        <button class="buy-btn" onclick="openOrder('257 Diamonds', '17,000 Ks', 'MMK')">ဝယ်ယူမည်</button>
+      </div>
+      <div class="card">
+        <span class="badge">Direct</span>
+        <div class="card-title">706 Diamonds</div>
+        <div class="card-price">46,000 Ks</div>
+        <button class="buy-btn" onclick="openOrder('706 Diamonds', '46,000 Ks', 'MMK')">ဝယ်ယူမည်</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== THB VIEW ==================== -->
+  <div id="view-thb" style="display: none;">
+    <div class="section-title">🔥 PASS & BUNDLE (THB)</div>
+    <div class="grid">
+      <div class="card">
+        <span class="badge">အထူးတန်</span>
+        <div class="card-title">Weekly Diamond Pass</div>
+        <div class="card-price">75 ฿</div>
+        <button class="buy-btn" onclick="openOrder('Weekly Diamond Pass', '75 ฿', 'THB')">ဝယ်ယူမည်</button>
+      </div>
+      <div class="card">
+        <span class="badge">Skin ရယူရန်</span>
+        <div class="card-title">Twilight Pass</div>
+        <div class="card-price">395 ฿</div>
+        <button class="buy-btn" onclick="openOrder('Twilight Pass', '395 ฿', 'THB')">ဝယ်ယူမည်</button>
+      </div>
+      <div class="card">
+        <span class="badge">Bundle</span>
+        <div class="card-title">Weekly Elite Bundle</div>
+        <div class="card-price">40 ฿</div>
+        <button class="buy-btn" onclick="openOrder('Weekly Elite Bundle', '40 ฿', 'THB')">ဝယ်ယူမည်</button>
+      </div>
+      <div class="card">
+        <span class="badge">Bundle</span>
+        <div class="card-title">Monthly Epic Bundle</div>
+        <div class="card-price">200 ฿</div>
+        <button class="buy-btn" onclick="openOrder('Monthly Epic Bundle', '200 ฿', 'THB')">ဝယ်ယူမည်</button>
+      </div>
+    </div>
+
+    <div class="section-title">⚡ စိန်သီးသန့် DIAMONDS (THB)</div>
+    <div class="grid">
+      <div class="card">
+        <span class="badge">Direct</span>
+        <div class="card-title">86 Diamonds</div>
+        <div class="card-price">60 ฿</div>
+        <button class="buy-btn" onclick="openOrder('86 Diamonds', '60 ฿', 'THB')">ဝယ်ယူမည်</button>
+      </div>
+      <div class="card">
+        <span class="badge">Direct</span>
+        <div class="card-title">172 Diamonds</div>
+        <div class="card-price">120 ฿</div>
+        <button class="buy-btn" onclick="openOrder('172 Diamonds', '120 ฿', 'THB')">ဝယ်ယူမည်</button>
+      </div>
+      <div class="card">
+        <span class="badge">Direct</span>
+        <div class="card-title">257 Diamonds</div>
+        <div class="card-price">180 ฿</div>
+        <button class="buy-btn" onclick="openOrder('257 Diamonds', '180 ฿', 'THB')">ဝယ်ယူမည်</button>
+      </div>
+      <div class="card">
+        <span class="badge">Direct</span>
+        <div class="card-title">706 Diamonds</div>
+        <div class="card-price">480 ฿</div>
+        <button class="buy-btn" onclick="openOrder('706 Diamonds', '480 ฿', 'THB')">ဝယ်ယူမည်</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Order Modal -->
   <div class="modal" id="orderModal">
@@ -141,107 +252,14 @@
     const BOT_TOKEN = "8834166717:AAFfuD_ge9Xkfa48sp0iBaRXRpHALWaI5uk";
     const ADMIN_CHAT_ID = "8863215122";
 
-    let currentCurrency = 'MMK';
-    let selectedPackage = null;
-
-    const passList = [
-      { name: "Weekly Diamond Pass", badge: "အထူးတန်", mmk: 7000, thb: 75 },
-      { name: "Twilight Pass", badge: "Skin ရယူရန်", mmk: 37500, thb: 395 },
-      { name: "Weekly Elite Bundle", badge: "Bundle", mmk: 3800, thb: 40 },
-      { name: "Monthly Epic Bundle", badge: "Bundle", mmk: 18800, thb: 200 }
-    ];
-
-    const diamondList = [
-      { name: "86 Diamonds", badge: "Direct", mmk: 5800, thb: 60 },
-      { name: "172 Diamonds", badge: "Direct", mmk: 11500, thb: 120 },
-      { name: "257 Diamonds", badge: "Direct", mmk: 17000, thb: 180 },
-      { name: "343 Diamonds", badge: "Direct", mmk: 23000, thb: 240 },
-      { name: "706 Diamonds", badge: "Direct", mmk: 46000, thb: 480 },
-      { name: "2195 Diamonds", badge: "Direct", mmk: 140000, thb: 1450 }
-    ];
+    let currentOrder = { name: '', price: '', currency: 'MMK' };
 
     function switchCurrency(curr) {
-      currentCurrency = curr;
-      document.getElementById('btn-mmk').className = (curr === 'MMK') ? 'currency-btn active' : 'currency-btn';
-      document.getElementById('btn-thb').className = (curr === 'THB') ? 'currency-btn active' : 'currency-btn';
-      renderPackages();
-    }
+      const vMmk = document.getElementById('view-mmk');
+      const vThb = document.getElementById('view-thb');
+      const bMmk = document.getElementById('btn-mmk');
+      const bThb = document.getElementById('btn-thb');
 
-    function renderPackages() {
-      // Render Passes
-      const passBox = document.getElementById('pass-grid');
-      let passHtml = '';
-      for (let i = 0; i < passList.length; i++) {
-        const item = passList[i];
-        const price = (currentCurrency === 'MMK') ? item.mmk.toLocaleString() + ' Ks' : item.thb.toLocaleString() + ' ฿';
-        passHtml += `
-          <div class="card">
-            <span class="badge">${item.badge}</span>
-            <div class="card-title">${item.name}</div>
-            <div class="card-price">${price}</div>
-            <button class="buy-btn" onclick="openOrder('pass', ${i})">ဝယ်ယူမည်</button>
-          </div>
-        `;
-      }
-      passBox.innerHTML = passHtml;
-
-      // Render Diamonds
-      const diaBox = document.getElementById('diamond-grid');
-      let diaHtml = '';
-      for (let i = 0; i < diamondList.length; i++) {
-        const item = diamondList[i];
-        const price = (currentCurrency === 'MMK') ? item.mmk.toLocaleString() + ' Ks' : item.thb.toLocaleString() + ' ฿';
-        diaHtml += `
-          <div class="card">
-            <span class="badge">${item.badge}</span>
-            <div class="card-title">${item.name}</div>
-            <div class="card-price">${price}</div>
-            <button class="buy-btn" onclick="openOrder('dia', ${i})">ဝယ်ယူမည်</button>
-          </div>
-        `;
-      }
-      diaBox.innerHTML = diaHtml;
-    }
-
-    function openOrder(type, index) {
-      selectedPackage = (type === 'pass') ? passList[index] : diamondList[index];
-      const priceText = (currentCurrency === 'MMK') ? selectedPackage.mmk.toLocaleString() + ' Ks' : selectedPackage.thb.toLocaleString() + ' ฿';
-      document.getElementById('selectedItemDisplay').value = selectedPackage.name + ' (' + priceText + ')';
-
-      const payBox = document.getElementById('paymentDetails');
-      if (currentCurrency === 'MMK') {
-        payBox.innerHTML = `
-          <b>🇲🇲 မြန်မာကျပ်ဖြင့် ငွေလွှဲရန် အကောင့်:</b><br>
-          • KPay / Wave: <b>09xxxxxxxxx</b> (ဦးဝန)<br>
-          ကျသင့်ငွေ: <b>${priceText}</b>
-        `;
-      } else {
-        payBox.innerHTML = `
-          <b>🇹🇭 ထိုင်းဘတ်ဖြင့် ငွေလွှဲရန် အကောင့်:</b><br>
-          • PromptPay / K-Bank: <b>08xxxxxxxx</b> (Phyo Wanna)<br>
-          ကျသင့်ငွေ: <b>${priceText}</b>
-        `;
-      }
-
-      document.getElementById('orderModal').style.display = 'flex';
-    }
-
-    function closeModal() {
-      document.getElementById('orderModal').style.display = 'none';
-    }
-
-    async function submitOrder() {
-      const uid = document.getElementById('userId').value.trim();
-      const zone = document.getElementById('zoneId').value.trim();
-      const fileInput = document.getElementById('slipFile');
-
-      if (!uid || !zone) {
-        alert("User ID နှင့် Server ID ကို အပြည့်အစုံ ဖြည့်ပေးပါခင်ဗျာ။");
-        return;
-      }
-      if (!fileInput.files || fileInput.files.length === 0) {
-        alert("ငွေလွှဲပြေစာ (စလစ်) ပုံ ရွေးပေးပါခင်ဗျာ။");
-        return;
-      }
-
-      const submitBtn = document.getElementById('btnSubmit');
+      if (curr === 'MMK') {
+        vMmk.style.display = 'block';
+        vThb.style
