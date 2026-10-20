@@ -1,8 +1,8 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-import httpx
-from datetime import datetime
-import pytz
+import urllib.request
+import json
+from datetime import datetime, timezone, timedelta
 
 app = FastAPI()
 
@@ -16,9 +16,21 @@ app.add_middleware(
 
 BOT_TOKEN = "8834166717:AAFfuD_ge9Xkfa48sp0iBaRXRpHALWaI5uk"
 
+def send_telegram(endpoint, payload):
+    try:
+        url = f"https://api.telegram.org/bot{BOT_TOKEN}/{endpoint}"
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Content-Type": "application/json"}
+        )
+        urllib.request.urlopen(req, timeout=5)
+    except Exception as e:
+        print("Telegram API Error:", e)
+
 @app.get("/")
 def home():
-    return {"status": "ok", "service": "MLBB Shop Bot Engine"}
+    return {"status": "ok"}
 
 @app.post("/webhook")
 async def telegram_webhook(req: Request):
@@ -30,15 +42,21 @@ async def telegram_webhook(req: Request):
             callback_id = cq.get("id")
             callback_data = cq.get("data", "")
             
-            # format: done|BUYER_ID|SN သို့မဟုတ် d|BUYER_ID|SN နှစ်မျိုးလုံးကို လက်ခံခြင်း
-            if callback_data.startswith("done|") or callback_data.startswith("d|") or callback_data.startswith("d:"):
-                # Delimiter ကို ခွဲယူခြင်း
-                sep = "|" if "|" in callback_data else ":"
-                parts = callback_data.split(sep)
+            # Pop-up အမြန်ပိတ်ရန်
+            send_telegram("answerCallbackQuery", {
+                "callback_query_id": callback_id,
+                "text": "Report ပို့ပြီးပါပြီရှင့်!"
+            })
+
+            # Data ခွဲယူခြင်း
+            sep = "|" if "|" in callback_data else ":"
+            parts = callback_data.split(sep)
+            
+            if len(parts) >= 2:
                 customer_chat_id = parts[1]
                 sn = parts[2] if len(parts) > 2 else "-"
 
-                # Caption စာကြောင်းများထဲမှ Data ဆွဲထုတ်ခြင်း
+                # Message Caption မှ စာသားရှာဖွေခြင်း
                 msg = cq.get("message", {})
                 caption_text = msg.get("caption", "") or msg.get("text", "")
                 
@@ -55,8 +73,9 @@ async def telegram_webhook(req: Request):
                     elif "Server:" in clean:
                         server_id = clean.split("Server:")[-1].strip()
 
-                tz = pytz.timezone("Asia/Yangon")
-                now = datetime.now(tz)
+                # မြန်မာစံတော်ချိန် (UTC+6:30)
+                tz_mm = timezone(timedelta(hours=6, minutes=30))
+                now = datetime.now(tz_mm)
                 now_time = now.strftime("%I:%M %p")
                 now_date = now.strftime("%d/%m/%Y")
 
@@ -71,41 +90,28 @@ async def telegram_webhook(req: Request):
                     f"Status : စိန်ထည့်သွင်းပြီးပါပြီ ✅\n\n"
                     f"May Lay Game Store ကို အသုံးပြုပေးသည့်အတွက် ကျေးဇူးအထူးတင်ရှိပါသည်ရှင့်။ 🙏"
                 )
-                
-                async with httpx.AsyncClient(timeout=10.0) as client:
-                    # ၁။ Callback Query Answer ပေးခြင်း
-                    await client.post(
-                        f"https://api.telegram.org/bot{BOT_TOKEN}/answerCallbackQuery",
-                        json={"callback_query_id": callback_id, "text": "Customer ဆီ Report ပို့ပြီးပါပြီရှင့်!"}
-                    )
 
-                    # ၂။ Customer ဆီ မက်ဆေ့ခ်ျ ပို့ခြင်း
-                    await client.post(
-                        f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
-                        json={
-                            "chat_id": customer_chat_id,
-                            "text": customer_msg
+                # ၁။ Customer ဆီ စာပို့ခြင်း
+                send_telegram("sendMessage", {
+                    "chat_id": customer_chat_id,
+                    "text": customer_msg
+                })
+
+                # ၂။ Admin Button ကို ပြောင်းလဲခြင်း
+                chat_id = msg.get("chat", {}).get("id")
+                message_id = msg.get("message_id")
+                if chat_id and message_id:
+                    send_telegram("editMessageReplyMarkup", {
+                        "chat_id": chat_id,
+                        "message_id": message_id,
+                        "reply_markup": {
+                            "inline_keyboard": [
+                                [{"text": "✅ စိန်ထည့်သွင်းပြီးကြောင်း အကြောင်းကြားပြီးပါပြီ", "callback_data": "already_done"}]
+                            ]
                         }
-                    )
-                    
-                    # ၃။ Admin ဘက်က ခလုတ်ကို ပြီးပါပြီ အဖြစ် ပြောင်းလဲခြင်း
-                    chat_id = msg.get("chat", {}).get("id")
-                    message_id = msg.get("message_id")
-                    if chat_id and message_id:
-                        await client.post(
-                            f"https://api.telegram.org/bot{BOT_TOKEN}/editMessageReplyMarkup",
-                            json={
-                                "chat_id": chat_id,
-                                "message_id": message_id,
-                                "reply_markup": {
-                                    "inline_keyboard": [
-                                        [{"text": "✅ စိန်ထည့်သွင်းပြီးကြောင်း အကြောင်းကြားပြီးပါပြီ", "callback_data": "already_done"}]
-                                    ]
-                                }
-                            }
-                        )
+                    })
 
         return {"ok": True}
     except Exception as e:
         print("Webhook Error:", e)
-        return {"ok": False, "error": str(e)}
+        return {"ok": False}
