@@ -366,12 +366,13 @@
                 `🆔 **User Telegram ID:** \`${buyerId}\`\n` +
                 `⏰ **အချိန်:** ${new Date().toLocaleString()}`;
 
+            // callback_data ကို ရှင်းလင်းစွာ ခွဲနိုင်ရန် 'done|BUYER_ID|SN' ဖြင့် ပို့ပါသည်
             const replyMarkup = {
                 inline_keyboard: [
                     [
                         {
                             text: "✅ စိန်ဖြည့်ပြီးပါပြီ (Transaction Report ပို့ရန်)",
-                            callback_data: `done|${buyerId}|${gameId}|${serverId}|${snCode}|${selectedProduct.name}`
+                            callback_data: `done|${buyerId}|${snCode}`
                         }
                     ]
                 ]
