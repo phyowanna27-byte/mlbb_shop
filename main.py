@@ -30,13 +30,15 @@ async def telegram_webhook(req: Request):
             callback_id = cq.get("id")
             callback_data = cq.get("data", "")
             
-            # format: d|BUYER_ID|SN
-            if callback_data.startswith("d|"):
-                parts = callback_data.split("|")
+            # format: done|BUYER_ID|SN သို့မဟုတ် d|BUYER_ID|SN နှစ်မျိုးလုံးကို လက်ခံခြင်း
+            if callback_data.startswith("done|") or callback_data.startswith("d|") or callback_data.startswith("d:"):
+                # Delimiter ကို ခွဲယူခြင်း
+                sep = "|" if "|" in callback_data else ":"
+                parts = callback_data.split(sep)
                 customer_chat_id = parts[1]
                 sn = parts[2] if len(parts) > 2 else "-"
 
-                # မက်ဆေ့ခ်ျစာသားထဲမှ အချက်အလက်ဖတ်ယူခြင်း
+                # Caption စာကြောင်းများထဲမှ Data ဆွဲထုတ်ခြင်း
                 msg = cq.get("message", {})
                 caption_text = msg.get("caption", "") or msg.get("text", "")
                 
@@ -53,7 +55,6 @@ async def telegram_webhook(req: Request):
                     elif "Server:" in clean:
                         server_id = clean.split("Server:")[-1].strip()
 
-                # အချိန်နှင့် ရက်စွဲ
                 tz = pytz.timezone("Asia/Yangon")
                 now = datetime.now(tz)
                 now_time = now.strftime("%I:%M %p")
@@ -71,14 +72,14 @@ async def telegram_webhook(req: Request):
                     f"May Lay Game Store ကို အသုံးပြုပေးသည့်အတွက် ကျေးဇူးအထူးတင်ရှိပါသည်ရှင့်။ 🙏"
                 )
                 
-                async with httpx.AsyncClient(timeout=15.0) as client:
-                    # ၁။ Telegram Pop-up ချက်ချင်းပိတ်ခြင်း
+                async with httpx.AsyncClient(timeout=10.0) as client:
+                    # ၁။ Callback Query Answer ပေးခြင်း
                     await client.post(
                         f"https://api.telegram.org/bot{BOT_TOKEN}/answerCallbackQuery",
-                        json={"callback_query_id": callback_id, "text": "Customer ဆီ စာပို့လိုက်ပါပြီရှင့်!"}
+                        json={"callback_query_id": callback_id, "text": "Customer ဆီ Report ပို့ပြီးပါပြီရှင့်!"}
                     )
 
-                    # ၂။ Customer ဆီ စာပို့ခြင်း
+                    # ၂။ Customer ဆီ မက်ဆေ့ခ်ျ ပို့ခြင်း
                     await client.post(
                         f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
                         json={
@@ -87,7 +88,7 @@ async def telegram_webhook(req: Request):
                         }
                     )
                     
-                    # ၃။ Admin Message ခလုတ်အား 'ပြီးပါပြီ' အဖြစ် ပြောင်းလဲခြင်း
+                    # ၃။ Admin ဘက်က ခလုတ်ကို ပြီးပါပြီ အဖြစ် ပြောင်းလဲခြင်း
                     chat_id = msg.get("chat", {}).get("id")
                     message_id = msg.get("message_id")
                     if chat_id and message_id:
@@ -98,7 +99,7 @@ async def telegram_webhook(req: Request):
                                 "message_id": message_id,
                                 "reply_markup": {
                                     "inline_keyboard": [
-                                        [{"text": "✅ စိန်ထည့်သွင်းပြီးကြောင်း အကြောင်းကြားပြီးပါပြီ", "callback_data": "done"}]
+                                        [{"text": "✅ စိန်ထည့်သွင်းပြီးကြောင်း အကြောင်းကြားပြီးပါပြီ", "callback_data": "already_done"}]
                                     ]
                                 }
                             }
@@ -106,5 +107,5 @@ async def telegram_webhook(req: Request):
 
         return {"ok": True}
     except Exception as e:
-        print("Error:", e)
-        return {"ok": False}
+        print("Webhook Error:", e)
+        return {"ok": False, "error": str(e)}
