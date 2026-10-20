@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import httpx
 from datetime import datetime
 import pytz
+import re
 
 app = FastAPI()
 
@@ -30,29 +31,38 @@ async def telegram_webhook(req: Request):
             callback_id = cq["id"]
             callback_data = cq.get("data", "")
             
-            # format: done|USER_ID|GAME_ID|SERVER|SN|ITEM_NAME
-            if callback_data.startswith("done|"):
-                parts = callback_data.split("|")
+            # format: d:BUYER_ID:SN (Telegram 64-byte limit မကျော်စေရန်)
+            if callback_data.startswith("d:"):
+                parts = callback_data.split(":")
                 customer_chat_id = parts[1]
-                game_id = parts[2] if len(parts) > 2 else "-"
-                server_id = parts[3] if len(parts) > 3 else "-"
-                sn = parts[4] if len(parts) > 4 else "-"
-                item_name = parts[5] if len(parts) > 5 else "MLBB Diamonds"
+                sn = parts[2] if len(parts) > 2 else "-"
+
+                # Admin Message ထဲမှ Item, Game ID, Server ကို ပြန်လည်ဖတ်ယူခြင်း
+                msg = cq.get("message", {})
+                caption_text = msg.get("caption", "") or msg.get("text", "")
+                
+                item_match = re.search(r"💎 \*\*ပစ္စည်း:\*\* (.+)", caption_text)
+                game_match = re.search(r"🆔 \*\*Game ID:\*\* `?(\d+)`?", caption_text)
+                server_match = re.search(r"🌐 \*\*Server:\*\* `?(\d+)`?", caption_text)
+
+                item_name = item_match.group(1).strip() if item_match else "MLBB Diamonds"
+                game_id = game_match.group(1).strip() if game_match else "-"
+                server_id = server_match.group(1).strip() if server_match else "-"
 
                 # အချိန်နှင့် ရက်စွဲ
                 tz = pytz.timezone("Asia/Yangon")
                 now_str = datetime.now(tz).strftime("%I:%M %p\n%d/%m/%Y")
 
-                # Customer ဆီ ပို့မည့် စာသား
+                # Customer ဆီ ပို့မည့် စာသား ("ရှင့်" ဖြင့် ပြောင်းလဲထားပါသည်)
                 customer_msg = (
                     f"==== Transaction Report ====\n"
-                    f"UID : {game_id} ({server_id})\n"
+                    f"UID : {game_id}({server_id})\n"
                     f"Order : {item_name}\n"
                     f"SN : {sn}\n"
                     f"Time : {now_str}\n"
                     f"===== MLBB SUCCESS =====\n"
                     f"Status : စိန်ထည့်သွင်းပြီးပါပြီ ✅\n\n"
-                    f"May Lay Game Store ကို အသုံးပြုပေးသည့်အတွက် ကျေးဇူးတင်ရှိပါသည်ရှင့်။ 🙏"
+                    f"May Lay Game Store ကို အသုံးပြုပေးသည့်အတွက် ကျေးဇူးအထူးတင်ရှိပါသည်ရှင့်။ 🙏"
                 )
                 
                 async with httpx.AsyncClient(timeout=8.0) as client:
@@ -65,8 +75,7 @@ async def telegram_webhook(req: Request):
                         }
                     )
                     
-                    # ၂။ Admin Message ခလုတ်ကို အောင်မြင်ပြီးအဖြစ် ပြောင်းလဲခြင်း
-                    msg = cq.get("message", {})
+                    # ၂။ Admin ခလုတ်အား 'ပြီးပါပြီ' အဖြစ် ပြောင်းလဲခြင်း
                     chat_id = msg.get("chat", {}).get("id")
                     message_id = msg.get("message_id")
                     
@@ -78,7 +87,7 @@ async def telegram_webhook(req: Request):
                                 "message_id": message_id,
                                 "reply_markup": {
                                     "inline_keyboard": [
-                                        [{"text": "✅ စိန်ထည့်သွင်းပြီးကြောင်း အကြောင်းကြားပြီးပါပြီ", "callback_data": "already_done"}]
+                                        [{"text": "✅ စိန်ထည့်သွင်းပြီးကြောင်း အကြောင်းကြားပြီးပါပြီ", "callback_data": "done"}]
                                     ]
                                 }
                             }
