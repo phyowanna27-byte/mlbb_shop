@@ -145,7 +145,7 @@
 
         <div class="notice-card">
             <p>📌 <strong>လိုအပ်ချက်:</strong> User ID + Zone ID (Server ID)</p>
-            <p>⚡ <strong>ကြာမြင့်ချိန်:</strong> အချိန်စောင့်စရာမလိုဘဲ တန်းရောက်ပါသည်။</p>
+            <p>⚡ <strong>ကြာမြင့်ချိန်:</strong> အချိန်စောင့်စရာမလိုဘဲ တန်းရောက်ပါသည်ရှင့်။</p>
         </div>
 
         <div id="productsArea">
@@ -179,7 +179,7 @@
             <div id="paymentBox"></div>
 
             <div class="warning-box">
-                ⚠️ <strong>သတိပြုရန်:</strong> Game ID နှင့် Server နံပါတ် မှန်ကန်စွာ ဖြည့်သွင်းပေးပါ။<br>
+                ⚠️ <strong>သတိပြုရန်:</strong> Game ID နှင့် Server နံပါတ် မှန်ကန်စွာ ဖြည့်သွင်းပေးပါရှင့်။<br>
                 ❌ Note တွင် စိန်ဝယ်ခြင်း၊ MLBB စသည့် ဂိမ်းနာမည်များ လုံးဝမရေးရပါ။
             </div>
 
@@ -236,7 +236,7 @@
                 renderCards();
             } catch (err) {
                 console.error("Price fetch error:", err);
-                document.getElementById("productsArea").innerHTML = `<p style="text-align: center; color: #f87171;">ဈေးနှုန်းစာရင်း ရယူ၍မရပါ</p>`;
+                document.getElementById("productsArea").innerHTML = `<p style="text-align: center; color: #f87171;">ဈေးနှုန်းစာရင်း ရယူ၍မရပါရှင့်</p>`;
             }
         }
 
@@ -329,11 +329,11 @@
             const submitBtn = document.getElementById("submitBtn");
 
             if (!gameId || !serverId) {
-                alert("Game ID နှင့် Server ဖြည့်သွင်းပေးပါခင်ဗျာ။");
+                alert("Game ID နှင့် Server ဖြည့်သွင်းပေးပါရှင့်။");
                 return;
             }
             if (!slipInput.files || slipInput.files.length === 0) {
-                alert("ငွေလွှဲစလစ်ပြေစာ ပုံ ရွေးချယ်ပေးပါခင်ဗျာ။");
+                alert("ငွေလွှဲစလစ်ပြေစာ ပုံ ရွေးချယ်ပေးပါရှင့်။");
                 return;
             }
 
@@ -341,12 +341,12 @@
             submitBtn.disabled = true;
             submitBtn.innerText = "အော်ဒါတင်ပို့နေပါသည်...";
 
-            // ဝယ်သူ၏ Telegram User ID နှင့် အချက်အလက်များ
             const user = tg?.initDataUnsafe?.user;
             const buyerId = user ? user.id : "";
             const buyerName = user ? (user.first_name + (user.last_name ? " " + user.last_name : "")) : "Customer";
             const buyerUsername = user?.username ? `@${user.username}` : "No Username";
 
+            const snCode = "S" + Math.floor(10000000 + Math.random() * 90000000);
             const amountText = currentCurrency === "THB" ? `${selectedProduct.thb} ฿` : `${Number(selectedProduct.mmk).toLocaleString()} Ks`;
 
             const caption = `🚨 **အော်ဒါအသစ် ရောက်ရှိပါသည်!** 🚨\n\n` +
@@ -354,18 +354,18 @@
                 `💰 **ကျသင့်ငွေ:** ${amountText}\n` +
                 `🌐 **ငွေပေးချေမှု:** ${currentCurrency === "THB" ? "ထိုင်းဘတ် (Bangkok Bank)" : "မြန်မာကျပ် (KPay / Wave)"}\n\n` +
                 `🆔 **Game ID:** \`${gameId}\`\n` +
-                `🌐 **Server:** \`${serverId}\`\n\n` +
+                `🌐 **Server:** \`${serverId}\`\n` +
+                `🧾 **SN:** \`${snCode}\`\n\n` +
                 `👤 **ဝယ်ယူသူ:** ${buyerName} (${buyerUsername})\n` +
                 `🆔 **User Telegram ID:** \`${buyerId}\`\n` +
                 `⏰ **အချိန်:** ${new Date().toLocaleString()}`;
 
-            // စိန်ဖြည့်ပြီးကြောင်း နှိပ်မည့် Inline Button
             const replyMarkup = {
                 inline_keyboard: [
                     [
                         {
-                            text: "✅ စိန်ဖြည့်ပြီးပါပြီ (ဝယ်သူဆီ အသိပေးစာပို့ရန်)",
-                            callback_data: `done:${buyerId}:${selectedProduct.name}`
+                            text: "✅ စိန်ဖြည့်ပြီးပါပြီ (Transaction Report ပို့ရန်)",
+                            callback_data: `done:${buyerId}:${gameId}:${serverId}:${selectedProduct.name}:${snCode}`
                         }
                     ]
                 ]
@@ -388,7 +388,7 @@
                 const resData = await res.json();
 
                 if (resData.ok) {
-                    alert("အော်ဒါတင်ခြင်း အောင်မြင်ပါသည်ခင်ဗျာ! မကြာမီ စိန်ဖြည့်သွင်းပေးပါမည်။");
+                    alert("အော်ဒါတင်ခြင်း အောင်မြင်ပါသည်ရှင့်! မကြာမီ စိန်ဖြည့်သွင်းပေးပါမည်။");
                     closeModal();
                     if (tg && tg.close) {
                         tg.close();
@@ -402,7 +402,7 @@
                 }
             } catch (err) {
                 console.error("Order error:", err);
-                alert("ချိတ်ဆက်မှု မအောင်မြင်ပါ။ ခေတ္တစောင့်ပြီး ပြန်လည် ကြိုးစားပေးပါခင်ဗျာ။");
+                alert("ချိတ်ဆက်မှု မအောင်မြင်ပါ။ ခေတ္တစောင့်ပြီး ပြန်လည် ကြိုးစားပေးပါရှင့်။");
                 submitBtn.disabled = false;
                 submitBtn.innerText = "🚀 အော်ဒါတင်မည်";
             }
