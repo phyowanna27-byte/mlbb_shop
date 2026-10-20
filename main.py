@@ -1,7 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import httpx
-import hashlib
 
 app = FastAPI()
 
@@ -13,71 +12,74 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-MEMBER_CODE = "M261020GEFP5242QJ"
-SECRET_KEY = "Dcffc4cfd50b6f4fc4ae9fce69331f4e9c8e4a53f118d9c177cb752007ceeda0"
+BOT_TOKEN = "8834166717:AAFfuD_ge9Xkfa48sp0iBaRXRpHALWaI5uk"
 
 @app.get("/")
 def home():
-    return {"status": "ok", "service": "MLBB Checker Engine"}
+    return {"status": "ok", "service": "MLBB Shop Bot Engine"}
 
-@app.get("/check")
-async def check_mlbb(id: str, zone: str):
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept": "application/json"
-    }
-
-    # 1. Official Tokovoucher Game Check
+# Telegram Inline Button နှိပ်လိုက်ရင် အလိုအလျောက် စာပြန်ပို့မည့် စနစ်
+@app.post("/webhook")
+async def telegram_webhook(req: Request):
     try:
-        sig = hashlib.md5(f"{MEMBER_CODE}:{SECRET_KEY}".encode()).hexdigest()
-        url_toko = f"https://api.tokovoucher.net/v1/check-game?member_code={MEMBER_CODE}&signature={sig}&game=mobile-legends&id={id}&zone={zone}"
-        async with httpx.AsyncClient(timeout=6.0, headers=headers) as client:
-            resp = await client.get(url_toko)
-            if resp.status_code == 200:
-                data = resp.json()
-                name = (
-                    data.get("data", {}).get("username")
-                    or data.get("data", {}).get("name")
-                    or data.get("name")
+        data = await req.json()
+        
+        # Admin က '✅ စိန်ဖြည့်ပြီးပါပြီ' ခလုတ် နှိပ်လိုက်သည့်အခါ
+        if "callback_query" in data:
+            cq = data["callback_query"]
+            callback_id = cq["id"]
+            callback_data = cq.get("data", "")
+            
+            # callback_data format: done:USER_TELEGRAM_ID:ITEM_NAME
+            if callback_data.startswith("done:"):
+                parts = callback_data.split(":")
+                customer_chat_id = parts[1]
+                item_name = parts[2] if len(parts) > 2 else "စိန်"
+
+                # ၁။ ဝယ်သူဆီ အကြောင်းကြားစာ ပို့ခြင်း
+                customer_msg = (
+                    f"🎉 **လူကြီးမင်း မှာယူထားသော အော်ဒါ ပြီးမြောက်ပါပြီ!** 🎉\n\n"
+                    f"💎 **ပစ္စည်း:** {item_name}\n"
+                    f"✅ လူကြီးမင်း ဂိမ်းအကောင့်ထဲသို့ စိန်ဖြည့်သွင်းပြီးပါပြီခင်ဗျာ။\n"
+                    f"ဂိမ်းထဲ ဝင်ရောက် စစ်ဆေးနိုင်ပါပြီ။\n\n"
+                    f"May Lay Game Store ကို အသုံးပြုပေးသည့်အတွက် ကျေးဇူးအထူးတင်ရှိပါသည်ခင်ဗျာ။ 🙏"
                 )
-                region = data.get("data", {}).get("zone") or data.get("data", {}).get("region") or ""
-                if name and "null" not in str(name).lower() and str(name).strip():
-                    return {"success": True, "name": name, "region": region}
-    except Exception:
-        pass
+                
+                async with httpx.AsyncClient(timeout=8.0) as client:
+                    await client.post(
+                        f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+                        json={
+                            "chat_id": customer_chat_id,
+                            "text": customer_msg,
+                            "parse_mode": "Markdown"
+                        }
+                    )
+                    
+                    # ၂။ Admin ဆီ ပေါ်နေတဲ့ ခလုတ်ကို 'ဖြည့်ပြီးပါပြီ' အဖြစ် ပြောင်းလဲခြင်း
+                    msg = cq.get("message", {})
+                    chat_id = msg.get("chat", {}).get("id")
+                    message_id = msg.get("message_id")
+                    
+                    if chat_id and message_id:
+                        await client.post(
+                            f"https://api.telegram.org/bot{BOT_TOKEN}/editMessageReplyMarkup",
+                            json={
+                                "chat_id": chat_id,
+                                "message_id": message_id,
+                                "reply_markup": {
+                                    "inline_keyboard": [
+                                        [{"text": "✅ စိန်ဖြည့်ပြီးကြောင်း အကြောင်းကြားပြီးပါပြီ", "callback_data": "already_done"}]
+                                    ]
+                                }
+                            }
+                        )
 
-    # 2. Tokovoucher Format (tujuan)
-    try:
-        sig = hashlib.md5(f"{MEMBER_CODE}:{SECRET_KEY}".encode()).hexdigest()
-        url_toko2 = f"https://api.tokovoucher.net/v1/check-game?member_code={MEMBER_CODE}&signature={sig}&game=mobile-legends&tujuan={id}{zone}"
-        async with httpx.AsyncClient(timeout=6.0, headers=headers) as client:
-            resp = await client.get(url_toko2)
-            if resp.status_code == 200:
-                data = resp.json()
-                name = (
-                    data.get("data", {}).get("username")
-                    or data.get("data", {}).get("name")
-                    or data.get("name")
-                )
-                if name and "null" not in str(name).lower() and str(name).strip():
-                    return {"success": True, "name": name, "region": ""}
-    except Exception:
-        pass
+                    # ၃။ Telegram Pop-up ပိတ်ရန်
+                    await client.post(
+                        f"https://api.telegram.org/bot{BOT_TOKEN}/answerCallbackQuery",
+                        json={"callback_query_id": callback_id, "text": "ဝယ်သူဆီ အကြောင်းကြားစာ ပို့ပြီးပါပြီခင်ဗျာ!"}
+                    )
 
-    # 3. Direct Smile Gateway
-    try:
-        url_smile = "https://www.smile.one/smilecoin/api/rolequery"
-        payload = {"userid": id, "zoneid": zone, "pid": 13}
-        headers_smile = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-            "Referer": "https://www.smile.one/"
-        }
-        async with httpx.AsyncClient(timeout=6.0, headers=headers_smile) as client:
-            resp = await client.post(url_smile, data=payload)
-            data = resp.json()
-            if data.get("status") == 200 and data.get("username"):
-                return {"success": True, "name": data.get("username"), "region": ""}
-    except Exception:
-        pass
-
-    return {"success": False, "name": "", "region": ""}
+        return {"ok": True}
+    except Exception as e:
+        return {"ok": False, "error": str(e)}
