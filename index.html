@@ -6,303 +6,116 @@
     <title>May Lay Game Store</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
         }
-        body {
-            background-color: #0b1120;
-            color: #f1f5f9;
-            padding: 16px 12px 40px 12px;
-            font-size: 14px;
+        body { 
+            background: linear-gradient(rgba(11, 17, 32, 0.88), rgba(11, 17, 32, 0.95)), 
+                        url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1000&auto=format&fit=crop') no-repeat center top fixed;
+            background-size: cover;
+            color: #f1f5f9; 
+            padding: 16px 12px 40px 12px; 
+            font-size: 14px; 
+            min-height: 100vh;
         }
-        .header {
-            text-align: center;
-            margin-bottom: 16px;
+        .header { text-align: center; margin-bottom: 16px; }
+        .header h1 { font-size: 20px; color: #38bdf8; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .header p { color: #94a3b8; font-size: 12px; margin-top: 4px; }
+        
+        /* Currency Switch */
+        .currency-switch { display: flex; gap: 10px; margin-bottom: 14px; }
+        .curr-btn { 
+            flex: 1; 
+            padding: 12px; 
+            border-radius: 10px; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            background: rgba(17, 28, 51, 0.85); 
+            backdrop-filter: blur(8px);
+            color: #94a3b8; 
+            font-size: 15px; 
+            font-weight: 600; 
+            cursor: pointer; 
         }
-        .header h1 {
-            font-size: 20px;
-            color: #38bdf8;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-        .header p {
-            color: #94a3b8;
-            font-size: 12px;
-            margin-top: 4px;
-        }
-
-        /* Currency Toggle */
-        .currency-switch {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 14px;
-        }
-        .curr-btn {
-            flex: 1;
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid #1e293b;
-            background: #111c33;
-            color: #94a3b8;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .curr-btn.active {
-            background: #0284c7;
-            color: #fff;
-            border-color: #38bdf8;
+        .curr-btn.active { 
+            background: #0284c7; 
+            color: #fff; 
+            border-color: #38bdf8; 
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
         }
 
-        /* Notice Box */
-        .notice-card {
-            background: #101d36;
-            border: 1px solid #1e3a5f;
-            border-radius: 10px;
-            padding: 12px 14px;
-            margin-bottom: 20px;
-            font-size: 12.5px;
-            line-height: 1.5;
-            color: #cbd5e1;
+        /* Notice Card */
+        .notice-card { 
+            background: rgba(16, 29, 54, 0.85); 
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(56, 189, 248, 0.2); 
+            border-radius: 10px; 
+            padding: 12px 14px; 
+            margin-bottom: 20px; 
+            font-size: 12.5px; 
+            line-height: 1.5; 
+            color: #cbd5e1; 
         }
-        .notice-card p {
-            margin-bottom: 4px;
-        }
-        .notice-card p:last-child {
-            margin-bottom: 0;
-        }
+        .notice-card p { margin-bottom: 4px; }
+        .notice-card p:last-child { margin-bottom: 0; }
 
         /* Category Header */
-        .category-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: #f59e0b;
-            margin: 18px 0 10px 4px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+        .category-title { font-size: 16px; font-weight: 700; color: #f59e0b; margin: 18px 0 10px 4px; display: flex; align-items: center; gap: 6px; }
 
-        /* Grid Cards */
-        .items-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
+        /* Items Grid */
+        .items-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
+        .item-card { 
+            background: rgba(21, 34, 56, 0.85); 
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            border-radius: 12px; 
+            padding: 14px 10px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            text-align: center; 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
-        .item-card {
-            background: #152238;
-            border: 1px solid #203354;
-            border-radius: 12px;
-            padding: 14px 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            position: relative;
-        }
-        .badge {
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 6px;
-            background: rgba(239, 68, 68, 0.25);
-            color: #fca5a5;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-        .badge.direct {
-            background: rgba(56, 189, 248, 0.2);
-            color: #7dd3fc;
-        }
-        .item-name {
-            font-size: 13.5px;
-            font-weight: 600;
-            color: #f8fafc;
-            min-height: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 6px;
-        }
-        .item-price {
-            font-size: 16px;
-            font-weight: 700;
-            color: #38bdf8;
-            margin-bottom: 12px;
-        }
-        .buy-btn {
-            width: 100%;
-            background: #0284c7;
-            color: #fff;
-            border: none;
-            padding: 9px 0;
-            border-radius: 8px;
-            font-size: 13.5px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .buy-btn:active {
-            background: #0369a1;
-        }
+        .badge { font-size: 10px; padding: 2px 8px; border-radius: 6px; background: rgba(239, 68, 68, 0.3); color: #fca5a5; font-weight: 600; margin-bottom: 8px; }
+        .badge.direct { background: rgba(56, 189, 248, 0.25); color: #7dd3fc; }
+        .item-name { font-size: 13.5px; font-weight: 600; color: #f8fafc; min-height: 38px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; }
+        .item-price { font-size: 16px; font-weight: 700; color: #38bdf8; margin-bottom: 12px; }
+        .buy-btn { width: 100%; background: #0284c7; color: #fff; border: none; padding: 9px 0; border-radius: 8px; font-size: 13.5px; font-weight: 600; cursor: pointer; }
+        .buy-btn:active { background: #0369a1; }
 
-        /* Modal Sheet */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.75);
-            z-index: 1000;
-            backdrop-filter: blur(2px);
-            align-items: flex-end;
-        }
-        .modal-content {
-            background: #152033;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            border-radius: 20px 20px 0 0;
-            padding: 20px 16px;
-            border-top: 2px solid #38bdf8;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+        /* Modal Overlay & Sheet */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1000; align-items: flex-end; }
+        .modal-content { 
+            background: #152033; 
+            width: 100%; 
+            max-height: 90vh; 
+            overflow-y: auto; 
+            border-radius: 20px 20px 0 0; 
+            padding: 20px 16px; 
+            border-top: 2px solid #38bdf8; 
             animation: slideUp 0.25s ease-out;
         }
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #243552;
-        }
-        .modal-header h3 {
-            font-size: 16px;
-            color: #38bdf8;
-        }
-        .close-btn {
-            background: none;
-            border: none;
-            color: #94a3b8;
-            font-size: 22px;
-            cursor: pointer;
-        }
-
-        .selected-banner {
-            background: #0b1424;
-            border: 1px solid #1e3a5f;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .selected-name {
-            font-weight: 600;
-            color: #fff;
-        }
-        .selected-price {
-            color: #4ade80;
-            font-weight: 700;
-            font-size: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 6px;
-            color: #cbd5e1;
-            font-size: 13px;
-            font-weight: 500;
-        }
-        input[type="text"], input[type="file"] {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #334e77;
-            background: #0b1220;
-            color: #fff;
-            margin-bottom: 12px;
-            outline: none;
-            font-size: 14px;
-        }
-        .row {
-            display: flex;
-            gap: 10px;
-        }
-        .col-7 { flex: 7; }
-        .col-5 { flex: 5; }
-
-        .btn-check {
-            width: 100%;
-            padding: 11px;
-            background: #4f46e5;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 12px;
-        }
-        .account-result {
-            background: #090f1d;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 14px;
-            border-left: 4px solid #38bdf8;
-            font-size: 13px;
-        }
-        .account-result p {
-            margin-bottom: 4px;
-        }
-
-        .bank-card {
-            background: #0b1220;
-            border: 1px solid #1f3454;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            font-size: 13px;
-        }
-        .bank-card .title {
-            color: #38bdf8;
-            font-weight: bold;
-            margin-bottom: 6px;
-        }
-        .warning-box {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid #ef4444;
-            padding: 8px 10px;
-            border-radius: 6px;
-            font-size: 11.5px;
-            color: #fca5a5;
-            margin-bottom: 14px;
-            line-height: 1.4;
-        }
-        .submit-btn {
-            width: 100%;
-            padding: 13px;
-            background: #0284c7;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #243552; }
+        .modal-header h3 { font-size: 16px; color: #38bdf8; }
+        .close-btn { background: none; border: none; color: #94a3b8; font-size: 22px; cursor: pointer; }
+        .selected-banner { background: #0b1424; border: 1px solid #1e3a5f; border-radius: 10px; padding: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+        .selected-name { font-weight: 600; color: #fff; }
+        .selected-price { color: #4ade80; font-weight: 700; font-size: 15px; }
+        label { display: block; margin-bottom: 6px; color: #cbd5e1; font-size: 13px; font-weight: 500; }
+        input[type="text"], input[type="file"] { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334e77; background: #0b1220; color: #fff; margin-bottom: 12px; outline: none; font-size: 14px; }
+        .row { display: flex; gap: 10px; }
+        .col-7 { flex: 7; } .col-5 { flex: 5; }
+        .btn-check { width: 100%; padding: 11px; background: #4f46e5; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-bottom: 12px; }
+        .account-result { background: #090f1d; padding: 12px; border-radius: 8px; margin-bottom: 14px; border-left: 4px solid #38bdf8; font-size: 13px; }
+        .account-result p { margin-bottom: 4px; }
+        .bank-card { background: #0b1220; border: 1px solid #1f3454; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; }
+        .bank-card .title { color: #38bdf8; font-weight: bold; margin-bottom: 6px; }
+        .warning-box { background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; padding: 8px 10px; border-radius: 6px; font-size: 11.5px; color: #fca5a5; margin-bottom: 14px; line-height: 1.4; }
+        .submit-btn { width: 100%; padding: 13px; background: #0284c7; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -521,12 +334,12 @@
             serverEl.innerHTML = `<span style="color: #94a3b8;">စစ်ဆေးနေပါသည်...</span>`;
 
             try {
-                const res = await fetch(`${CHECK_API_URL}?id=${id}&zone=${zone}`);
+                const res = await fetch(`${CHECK_API_URL}?id=${id}&zone=${zone}&t=${Date.now()}`);
                 const data = await res.json();
 
                 if (data.success && data.name) {
                     nameEl.innerHTML = `<span style="color: #4ade80; font-weight: bold;">${data.name}</span>`;
-                    serverEl.innerHTML = data.region ? data.region : "Verified";
+                    serverEl.innerHTML = data.region ? data.region : "Global / Verified";
                 } else {
                     nameEl.innerHTML = `<span style="color: #f87171;">အမည်ရှာမတွေ့ပါ (ID မှန်ပါက အော်ဒါဆက်တင်နိုင်ပါသည်)</span>`;
                     serverEl.innerHTML = "-";
