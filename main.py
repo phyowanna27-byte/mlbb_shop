@@ -15,42 +15,41 @@ app.add_middleware(
 @app.get("/check")
 async def check_mlbb(id: str, zone: str):
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Referer": "https://www.smile.one/"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
-    
-    # Provider 1: Smile One API direct validation
+
+    # နည်းလမ်း ၁ - ISAN API (Parameter သည် server ဖြစ်ရပါမည်)
     try:
-        url1 = "https://www.smile.one/smilecoin/api/rolequery"
-        payload = {"userid": id, "zoneid": zone, "pid": 13}
+        url1 = f"https://api.isan.eu.org/nickname/ml?id={id}&server={zone}"
         async with httpx.AsyncClient(timeout=8.0, headers=headers) as client:
-            resp = await client.post(url1, data=payload)
+            resp = await client.get(url1)
             data = resp.json()
-            if data.get("status") == 200 and data.get("username"):
-                return {"success": True, "name": data.get("username")}
+            if data.get("success") and data.get("name"):
+                return {"success": True, "name": data.get("name")}
     except Exception:
         pass
 
-    # Provider 2: Tokovoucher Check API
+    # နည်းလမ်း ၂ - Yanjie Store Proxy
     try:
-        url2 = f"https://api-check.tokovoucher.net/v1/check-game?game=mlbb&user_id={id}&zone_id={zone}"
+        url2 = f"https://yanjiestore.com/submitt.php?ID={id}&server={zone}"
         async with httpx.AsyncClient(timeout=8.0, headers=headers) as client:
             resp = await client.get(url2)
             data = resp.json()
-            name = data.get("data", {}).get("username") or data.get("name")
+            name = data.get("name") or data.get("username")
             if name:
                 return {"success": True, "name": name}
     except Exception:
         pass
 
-    # Provider 3: Backup Deno API
+    # နည်းလမ်း ၃ - Tokovoucher Check
     try:
-        url3 = f"https://isan-proxy.deno.dev/ml?id={id}&zone={zone}"
-        async with httpx.AsyncClient(timeout=8.0) as client:
+        url3 = f"https://api-check.tokovoucher.net/v1/check-game?game=mlbb&user_id={id}&zone_id={zone}"
+        async with httpx.AsyncClient(timeout=8.0, headers=headers) as client:
             resp = await client.get(url3)
             data = resp.json()
-            if data.get("name"):
-                return {"success": True, "name": data.get("name")}
+            name = data.get("data", {}).get("username") or data.get("name")
+            if name:
+                return {"success": True, "name": name}
     except Exception:
         pass
 
