@@ -13,15 +13,33 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
             -webkit-tap-highlight-color: transparent; 
         }
-        body { 
-            background: linear-gradient(rgba(11, 17, 32, 0.88), rgba(11, 17, 32, 0.95)), 
-                        url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1000&auto=format&fit=crop') no-repeat center top fixed;
-            background-size: cover;
-            color: #f1f5f9; 
-            padding: 16px 12px 40px 12px; 
-            font-size: 14px; 
+        html, body {
             min-height: 100vh;
+            background-color: #0b1120;
+            color: #f1f5f9; 
+            font-size: 14px;
         }
+        /* Background Layer with Banner.jpg.png */
+        .bg-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: linear-gradient(rgba(11, 17, 32, 0.82), rgba(11, 17, 32, 0.94)), 
+                              url('Banner.jpg.png');
+            background-position: center top;
+            background-repeat: no-repeat;
+            background-size: cover;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .main-container {
+            padding: 16px 12px 40px 12px;
+            position: relative;
+            z-index: 1;
+        }
+
         .header { text-align: center; margin-bottom: 16px; }
         .header h1 { font-size: 20px; color: #38bdf8; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .header p { color: #94a3b8; font-size: 12px; margin-top: 4px; }
@@ -32,7 +50,7 @@
             flex: 1; 
             padding: 12px; 
             border-radius: 10px; 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border: 1px solid rgba(255, 255, 255, 0.12); 
             background: rgba(17, 28, 51, 0.85); 
             backdrop-filter: blur(8px);
             color: #94a3b8; 
@@ -49,9 +67,9 @@
 
         /* Notice Card */
         .notice-card { 
-            background: rgba(16, 29, 54, 0.85); 
+            background: rgba(16, 29, 54, 0.88); 
             backdrop-filter: blur(8px);
-            border: 1px solid rgba(56, 189, 248, 0.2); 
+            border: 1px solid rgba(56, 189, 248, 0.25); 
             border-radius: 10px; 
             padding: 12px 14px; 
             margin-bottom: 20px; 
@@ -70,24 +88,24 @@
         .item-card { 
             background: rgba(21, 34, 56, 0.85); 
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.08); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
             border-radius: 12px; 
             padding: 14px 10px; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             text-align: center; 
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
         }
-        .badge { font-size: 10px; padding: 2px 8px; border-radius: 6px; background: rgba(239, 68, 68, 0.3); color: #fca5a5; font-weight: 600; margin-bottom: 8px; }
-        .badge.direct { background: rgba(56, 189, 248, 0.25); color: #7dd3fc; }
+        .badge { font-size: 10px; padding: 2px 8px; border-radius: 6px; background: rgba(239, 68, 68, 0.35); color: #fca5a5; font-weight: 600; margin-bottom: 8px; }
+        .badge.direct { background: rgba(56, 189, 248, 0.28); color: #7dd3fc; }
         .item-name { font-size: 13.5px; font-weight: 600; color: #f8fafc; min-height: 38px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; }
         .item-price { font-size: 16px; font-weight: 700; color: #38bdf8; margin-bottom: 12px; }
         .buy-btn { width: 100%; background: #0284c7; color: #fff; border: none; padding: 9px 0; border-radius: 8px; font-size: 13.5px; font-weight: 600; cursor: pointer; }
         .buy-btn:active { background: #0369a1; }
 
-        /* Modal Overlay & Sheet */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1000; align-items: flex-end; }
+        /* Modal Sheet */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.82); z-index: 1000; align-items: flex-end; }
         .modal-content { 
             background: #152033; 
             width: 100%; 
@@ -105,41 +123,45 @@
         .selected-banner { background: #0b1424; border: 1px solid #1e3a5f; border-radius: 10px; padding: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
         .selected-name { font-weight: 600; color: #fff; }
         .selected-price { color: #4ade80; font-weight: 700; font-size: 15px; }
+
         label { display: block; margin-bottom: 6px; color: #cbd5e1; font-size: 13px; font-weight: 500; }
         input[type="text"], input[type="file"] { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334e77; background: #0b1220; color: #fff; margin-bottom: 12px; outline: none; font-size: 14px; }
         .row { display: flex; gap: 10px; }
         .col-7 { flex: 7; } .col-5 { flex: 5; }
-        .btn-check { width: 100%; padding: 11px; background: #4f46e5; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-bottom: 12px; }
-        .account-result { background: #090f1d; padding: 12px; border-radius: 8px; margin-bottom: 14px; border-left: 4px solid #38bdf8; font-size: 13px; }
-        .account-result p { margin-bottom: 4px; }
+
         .bank-card { background: #0b1220; border: 1px solid #1f3454; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; }
         .bank-card .title { color: #38bdf8; font-weight: bold; margin-bottom: 6px; }
-        .warning-box { background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; padding: 8px 10px; border-radius: 6px; font-size: 11.5px; color: #fca5a5; margin-bottom: 14px; line-height: 1.4; }
+        .warning-box { background: rgba(239, 68, 68, 0.12); border: 1px solid #ef4444; padding: 8px 10px; border-radius: 6px; font-size: 11.5px; color: #fca5a5; margin-bottom: 14px; line-height: 1.4; }
         .submit-btn { width: 100%; padding: 13px; background: #0284c7; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>💎 May Lay Game Store</h1>
-        <p>MLBB စိန်နှင့် ပက်ကေ့ချ်များ အမြန်ဖြည့်သွင်းရန်</p>
-    </div>
+    <!-- Background Layer with May Lay Game Store Graphic -->
+    <div class="bg-layer"></div>
 
-    <!-- Currency Toggle -->
-    <div class="currency-switch">
-        <button type="button" class="curr-btn active" id="btnTHB" onclick="setCurrency('THB')">🇹🇭 ထိုင်းဘတ် (฿)</button>
-        <button type="button" class="curr-btn" id="btnMMK" onclick="setCurrency('MMK')">🇲🇲 မြန်မာကျပ် (Ks)</button>
-    </div>
+    <div class="main-container">
+        <div class="header">
+            <h1>💎 May Lay Game Store</h1>
+            <p>MLBB စိန်နှင့် ပက်ကေ့ချ်များ အမြန်ဖြည့်သွင်းရန်</p>
+        </div>
 
-    <!-- Notice -->
-    <div class="notice-card">
-        <p>📌 <strong>လိုအပ်ချက်:</strong> User ID + Zone ID (Server ID)</p>
-        <p>⚡ <strong>ကြာမြင့်ချိန်:</strong> အချိန်စောင့်စရာမလိုဘဲ တန်းရောက်ပါသည်။</p>
-    </div>
+        <!-- Currency Toggle -->
+        <div class="currency-switch">
+            <button type="button" class="curr-btn active" id="btnTHB" onclick="setCurrency('THB')">🇹🇭 ထိုင်းဘတ် (฿)</button>
+            <button type="button" class="curr-btn" id="btnMMK" onclick="setCurrency('MMK')">🇲🇲 မြန်မာကျပ် (Ks)</button>
+        </div>
 
-    <!-- Products Container -->
-    <div id="productsArea">
-        <p style="text-align: center; color: #94a3b8; padding: 20px;">ဈေးနှုန်းစာရင်း ရယူနေပါသည်...</p>
+        <!-- Notice -->
+        <div class="notice-card">
+            <p>📌 <strong>လိုအပ်ချက်:</strong> User ID + Zone ID (Server ID)</p>
+            <p>⚡ <strong>ကြာမြင့်ချိန်:</strong> အချိန်စောင့်စရာမလိုဘဲ တန်းရောက်ပါသည်။</p>
+        </div>
+
+        <!-- Products Container -->
+        <div id="productsArea">
+            <p style="text-align: center; color: #94a3b8; padding: 20px;">ဈေးနှုန်းစာရင်း ရယူနေပါသည်...</p>
+        </div>
     </div>
 
     <!-- Order Modal -->
@@ -166,18 +188,11 @@
                 </div>
             </div>
 
-            <button type="button" class="btn-check" onclick="checkAccount()">🔍 အကောင့်စစ်ဆေးမည်</button>
-
-            <div class="account-result">
-                <p>👤 <strong>ဂိမ်းနာမည်:</strong> <span id="nicknameDisplay">မစစ်ဆေးရသေးပါ</span></p>
-                <p>🌐 <strong>ဆာဗာဒေသ:</strong> <span id="serverRegionDisplay">-</span></p>
-            </div>
-
             <!-- Currency Based Payment Info -->
             <div id="paymentBox"></div>
 
             <div class="warning-box">
-                ⚠️ <strong>သတိပြုရန်:</strong> ငွေမလွှဲမီ နာမည်တူမှ ဆက်လွှဲပါ။<br>
+                ⚠️ <strong>သတိပြုရန်:</strong> Game ID နှင့် Server နံပါတ် မှန်ကန်စွာ ဖြည့်သွင်းပေးပါ။<br>
                 ❌ Note တွင် စိန်ဝယ်ခြင်း၊ MLBB စသည့် ဂိမ်းနာမည်များ လုံးဝမရေးရပါ။
             </div>
 
@@ -198,7 +213,6 @@
         const SHEET_ID = "19Ryx-h258rS8duejpKA2Y0WoD2drx77CkFzc-6MYBbg";
         const BOT_TOKEN = "8834166717:AAFfuD_ge9Xkfa48sp0iBaRXRpHALWaI5uk";
         const ADMIN_CHAT_ID = "8863215122";
-        const CHECK_API_URL = "https://mlbb-api-uk8a.onrender.com/check";
 
         let currentCurrency = "THB";
         let allProducts = [];
@@ -310,8 +324,9 @@
                 `;
             }
 
-            document.getElementById("nicknameDisplay").innerHTML = "မစစ်ဆေးရသေးပါ";
-            document.getElementById("serverRegionDisplay").innerHTML = "-";
+            document.getElementById("gameId").value = "";
+            document.getElementById("serverId").value = "";
+            document.getElementById("slipFile").value = "";
             document.getElementById("orderModal").style.display = "flex";
         }
 
@@ -319,42 +334,10 @@
             document.getElementById("orderModal").style.display = "none";
         }
 
-        async function checkAccount() {
-            const id = document.getElementById("gameId").value.trim();
-            const zone = document.getElementById("serverId").value.trim();
-            const nameEl = document.getElementById("nicknameDisplay");
-            const serverEl = document.getElementById("serverRegionDisplay");
-
-            if (!id || !zone) {
-                alert("Game ID နှင့် Server နံပါတ် အရင်ရိုက်ထည့်ပေးပါခင်ဗျာ။");
-                return;
-            }
-
-            nameEl.innerHTML = `<span style="color: #38bdf8;">အမည် စစ်ဆေးနေပါသည်...</span>`;
-            serverEl.innerHTML = `<span style="color: #94a3b8;">စစ်ဆေးနေပါသည်...</span>`;
-
-            try {
-                const res = await fetch(`${CHECK_API_URL}?id=${id}&zone=${zone}&t=${Date.now()}`);
-                const data = await res.json();
-
-                if (data.success && data.name) {
-                    nameEl.innerHTML = `<span style="color: #4ade80; font-weight: bold;">${data.name}</span>`;
-                    serverEl.innerHTML = data.region ? data.region : "Global / Verified";
-                } else {
-                    nameEl.innerHTML = `<span style="color: #f87171;">အမည်ရှာမတွေ့ပါ (ID မှန်ပါက အော်ဒါဆက်တင်နိုင်ပါသည်)</span>`;
-                    serverEl.innerHTML = "-";
-                }
-            } catch (err) {
-                nameEl.innerHTML = `<span style="color: #f87171;">အမည်ရှာမတွေ့ပါ (ID မှန်ပါက အော်ဒါဆက်တင်နိုင်ပါသည်)</span>`;
-                serverEl.innerHTML = "-";
-            }
-        }
-
         async function submitOrder() {
             if (!selectedProduct) return;
             const gameId = document.getElementById("gameId").value.trim();
             const serverId = document.getElementById("serverId").value.trim();
-            const nickname = document.getElementById("nicknameDisplay").innerText;
             const slipInput = document.getElementById("slipFile");
             const submitBtn = document.getElementById("submitBtn");
 
@@ -378,8 +361,7 @@
                 `💰 **ကျသင့်ငွေ:** ${amountText}\n` +
                 `🌐 **ငွေပေးချေမှု:** ${currentCurrency === "THB" ? "ထိုင်းဘတ် (Bangkok Bank)" : "မြန်မာကျပ် (KPay / Wave)"}\n\n` +
                 `🆔 **Game ID:** \`${gameId}\`\n` +
-                `🌐 **Server:** \`${serverId}\`\n` +
-                `👤 **အမည်:** ${nickname}\n\n` +
+                `🌐 **Server:** \`${serverId}\`\n\n` +
                 `⏰ **အချိန်:** ${new Date().toLocaleString()}`;
 
             try {
