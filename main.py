@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import httpx
 import hashlib
+import json
 
 app = FastAPI()
 
@@ -18,52 +19,73 @@ SECRET_KEY = "Dcffc4cfd50b6f4fc4ae9fce69331f4e9c8e4a53f118d9c177cb752007ceeda0"
 
 @app.get("/")
 def home():
-    return {"status": "ok", "service": "MLBB Checker"}
-
-@app.get("/debug")
-async def debug_check(id: str, zone: str):
-    sig = hashlib.md5(f"{MEMBER_CODE}:{SECRET_KEY}".encode()).hexdigest()
-    url = f"https://api.tokovoucher.net/v1/check-game?member_code={MEMBER_CODE}&signature={sig}&game=mobile-legends&id={id}&zone={zone}"
-    
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    }
-    
-    async with httpx.AsyncClient(timeout=10.0, headers=headers) as client:
-        resp = await client.get(url)
-        return {
-            "status_code": resp.status_code,
-            "response_text": resp.text
-        }
+    return {"status": "ok", "service": "MLBB Checker Engine"}
 
 @app.get("/check")
 async def check_mlbb(id: str, zone: str):
-    sig = hashlib.md5(f"{MEMBER_CODE}:{SECRET_KEY}".encode()).hexdigest()
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        "User-Agent": "Mozilla/5.0 (Linux; Android 13; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+        "Accept": "application/json, text/plain, */*",
+        "Content-Type": "application/json"
     }
-    
-    # 1. Tokovoucher Format A
+
+    # 1. Partner Fast Endpoint
     try:
-        url_toko = f"https://api.tokovoucher.net/v1/check-game?member_code={MEMBER_CODE}&signature={sig}&game=mobile-legends&id={id}&zone={zone}"
-        async with httpx.AsyncClient(timeout=10.0, headers=headers) as client:
-            resp = await client.get(url_toko)
-            data = resp.json()
-            name = data.get("data", {}).get("username") or data.get("data", {}).get("name") or data.get("name")
-            if name and "null" not in str(name).lower():
-                return {"success": True, "name": name}
+        url_partner = "https://api.neferbyte.com/v1/order/check-id"
+        payload = {"game": "mobile-legends", "user_id": id, "zone_id": zone}
+        async with httpx.AsyncClient(timeout=6.0, headers=headers) as client:
+            resp = await client.post(url_partner, json=payload)
+            if resp.status_code == 200:
+                res_data = resp.json()
+                username = res_data.get("data", {}).get("username") or res_data.get("username")
+                if username:
+                    return {"success": True, "name": username}
     except Exception:
         pass
 
-    # 2. Tokovoucher Format B (user_id & zone_id)
+    # 2. Tokovoucher REST Production API
     try:
-        url_toko2 = f"https://api.tokovoucher.net/v1/check-game?member_code={MEMBER_CODE}&signature={sig}&game=mobile-legends&user_id={id}&zone_id={zone}"
-        async with httpx.AsyncClient(timeout=10.0, headers=headers) as client:
-            resp = await client.get(url_toko2)
-            data = resp.json()
-            name = data.get("data", {}).get("username") or data.get("data", {}).get("name") or data.get("name")
-            if name and "null" not in str(name).lower():
-                return {"success": True, "name": name}
+        sig_raw = f"{MEMBER_CODE}:{SECRET_KEY}"
+        sig = hashlib.md5(sig_raw.encode()).hexdigest()
+        url_toko = f"https://api.tokovoucher.net/v1/check-game?member_code={MEMBER_CODE}&signature={sig}&game=mobile-legends&id={id}&zone={zone}"
+        async with httpx.AsyncClient(timeout=6.0, headers=headers) as client:
+            resp = await client.get(url_toko)
+            if resp.status_code == 200:
+                res_data = resp.json()
+                username = (
+                    res_data.get("data", {}).get("username")
+                    or res_data.get("data", {}).get("name")
+                    or res_data.get("name")
+                )
+                if username and "null" not in str(username).lower():
+                    return {"success": True, "name": username}
+    except Exception:
+        pass
+
+    # 3. Moonton Direct Gateway Query
+    try:
+        url_smile = "https://www.smile.one/smilecoin/api/rolequery"
+        post_data = {"userid": id, "zoneid": zone, "pid": 13}
+        smile_headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "Referer": "https://www.smile.one/"
+        }
+        async with httpx.AsyncClient(timeout=6.0, headers=smile_headers) as client:
+            resp = await client.post(url_smile, data=post_data)
+            res_data = resp.json()
+            if res_data.get("status") == 200 and res_data.get("username"):
+                return {"success": True, "name": res_data.get("username")}
+    except Exception:
+        pass
+
+    # 4. Fallback Open Node Check
+    try:
+        url_open = f"https://id-game-checker.vercel.app/api/mlbb?id={id}&zone={zone}"
+        async with httpx.AsyncClient(timeout=6.0) as client:
+            resp = await client.get(url_open)
+            res_data = resp.json()
+            if res_data.get("status") == 200 and res_data.get("username"):
+                return {"success": True, "name": res_data.get("username")}
     except Exception:
         pass
 
