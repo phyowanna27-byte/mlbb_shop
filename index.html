@@ -220,26 +220,21 @@
                 currentPrices = [];
 
                 rows.forEach((row, index) => {
-                    if (index === 0) return; // Header row
-                    
-                    let col0 = row.c[0]?.v !== undefined && row.c[0]?.v !== null ? String(row.c[0].v).trim() : "";
-                    let col1 = row.c[1]?.v !== undefined && row.c[1]?.v !== null ? String(row.c[1].v).trim() : "";
-                    let col2 = row.c[2]?.v !== undefined && row.c[2]?.v !== null ? String(row.c[2].v).trim() : "";
+                    // Column B (Index 1) = Name (50 + 5 Bonus 💎)
+                    // Column C (Index 2) = MMK (3800)
+                    // Column D (Index 3) = THB (32)
+                    const name = row.c[1]?.v ? String(row.c[1].v).trim() : "";
+                    const mmk = row.c[2]?.v !== undefined && row.c[2]?.v !== null ? String(row.c[2].v).trim() : "";
+                    const thb = row.c[3]?.v !== undefined && row.c[3]?.v !== null ? String(row.c[3].v).trim() : "";
 
-                    if (!col0 && !col1) return;
+                    // Header row သို့မဟုတ် အမည်မရှိပါက ကျော်မည်
+                    if (!name || name.toLowerCase() === "name") return;
 
-                    // Google Sheet Column ပုံစံ အလိုအလျောက် ညှိယူခြင်း
-                    let name = col0;
-                    let thb = col1.replace(/[^0-9.]/g, "");
-                    let mmk = col2.replace(/[^0-9.]/g, "");
-
-                    if (name) {
-                        currentPrices.push({ name, thb, mmk });
-                        const opt = document.createElement("option");
-                        opt.value = currentPrices.length - 1;
-                        opt.textContent = `${name} (${thb} ฿ / ${Number(mmk).toLocaleString()} Ks)`;
-                        select.appendChild(opt);
-                    }
+                    currentPrices.push({ name, thb, mmk });
+                    const opt = document.createElement("option");
+                    opt.value = currentPrices.length - 1;
+                    opt.textContent = `${name} (${thb} ฿ / ${Number(mmk).toLocaleString()} Ks)`;
+                    select.appendChild(opt);
                 });
 
                 updatePaymentAmount();
