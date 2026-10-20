@@ -174,6 +174,8 @@
         <div class="bank-info" style="margin-top: 10px;">
             <div class="bank-title">🇲🇲 မြန်မာကျပ်ငွေလွှဲရန် အကောင့်</div>
             <p>📱 <strong>KPay / WavePay</strong></p>
+            <p>• Account No: <strong>09776100118</strong></p>
+            <p>• Name: <strong>Daw May Thazin</strong></p>
             <p>• ကျသင့်ငွေ: <span id="mmkAmount" class="price-highlight">-</span></p>
         </div>
 
@@ -205,7 +207,6 @@
 
         let currentPrices = [];
 
-        // Google Sheet မှ စျေးနှုန်းများ ဆွဲယူခြင်း
         async function fetchPrices() {
             const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
             try {
@@ -216,19 +217,27 @@
 
                 const select = document.getElementById("packageSelect");
                 select.innerHTML = "";
-
                 currentPrices = [];
+
                 rows.forEach((row, index) => {
                     if (index === 0) return; // Header row
-                    const name = row.c[0]?.v || "";
-                    const thb = row.c[1]?.v || 0;
-                    const mmk = row.c[2]?.v || 0;
+                    
+                    let col0 = row.c[0]?.v !== undefined && row.c[0]?.v !== null ? String(row.c[0].v).trim() : "";
+                    let col1 = row.c[1]?.v !== undefined && row.c[1]?.v !== null ? String(row.c[1].v).trim() : "";
+                    let col2 = row.c[2]?.v !== undefined && row.c[2]?.v !== null ? String(row.c[2].v).trim() : "";
+
+                    if (!col0 && !col1) return;
+
+                    // Google Sheet Column ပုံစံ အလိုအလျောက် ညှိယူခြင်း
+                    let name = col0;
+                    let thb = col1.replace(/[^0-9.]/g, "");
+                    let mmk = col2.replace(/[^0-9.]/g, "");
 
                     if (name) {
                         currentPrices.push({ name, thb, mmk });
                         const opt = document.createElement("option");
                         opt.value = currentPrices.length - 1;
-                        opt.textContent = `${name} 💎 (${thb} ฿ / ${Number(mmk).toLocaleString()} Ks)`;
+                        opt.textContent = `${name} (${thb} ฿ / ${Number(mmk).toLocaleString()} Ks)`;
                         select.appendChild(opt);
                     }
                 });
@@ -237,7 +246,7 @@
             } catch (err) {
                 console.error("Price fetch error:", err);
                 const select = document.getElementById("packageSelect");
-                select.innerHTML = '<option value="">ဈေးနှုန်းစာရင်း ဆွဲယူ၍မရပါ</option>';
+                select.innerHTML = '<option value="">ဈေးနှုန်းစာရင်း ရယူ၍မရပါ</option>';
             }
         }
 
@@ -254,7 +263,6 @@
             }
         }
 
-        // Render Backend သို့ Nickname လှမ်းစစ်ခြင်း
         async function checkAccount() {
             const id = document.getElementById("gameId").value.trim();
             const zone = document.getElementById("serverId").value.trim();
@@ -267,7 +275,7 @@
             }
 
             nameEl.innerHTML = `<span style="color: #38bdf8;">အမည် စစ်ဆေးနေပါသည်...</span>`;
-            serverEl.innerHTML = `<span style="color: #94a3b8;">ရှာဖွေနေဆဲ...</span>`;
+            serverEl.innerHTML = `<span style="color: #94a3b8;">စစ်ဆေးနေပါသည်...</span>`;
 
             try {
                 const res = await fetch(`${CHECK_API_URL}?id=${id}&zone=${zone}`);
@@ -286,7 +294,6 @@
             }
         }
 
-        // Telegram Bot သို့ အော်ဒါနှင့် စလစ် ပေးပို့ခြင်း
         async function submitOrder() {
             const packageIdx = document.getElementById("packageSelect").value;
             const gameId = document.getElementById("gameId").value.trim();
@@ -355,7 +362,6 @@
             }
         }
 
-        // စာမျက်နှာစတင်ချိန်တွင် ဈေးနှုန်းများ ရယူပါ
         fetchPrices();
     </script>
 </body>
