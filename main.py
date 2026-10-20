@@ -27,16 +27,16 @@ async def telegram_webhook(req: Request):
         
         if "callback_query" in data:
             cq = data["callback_query"]
-            callback_id = cq["id"]
+            callback_id = cq.get("id")
             callback_data = cq.get("data", "")
             
-            # format: d:BUYER_ID:SN
-            if callback_data.startswith("d:"):
-                parts = callback_data.split(":")
+            # format: d|BUYER_ID|SN
+            if callback_data.startswith("d|"):
+                parts = callback_data.split("|")
                 customer_chat_id = parts[1]
                 sn = parts[2] if len(parts) > 2 else "-"
 
-                # Caption ထဲမှ စာကြောင်းလိုက် ရှာဖွေခြင်း (Regex မလိုဘဲ အမှားကင်းစေရန်)
+                # မက်ဆေ့ခ်ျစာသားထဲမှ အချက်အလက်ဖတ်ယူခြင်း
                 msg = cq.get("message", {})
                 caption_text = msg.get("caption", "") or msg.get("text", "")
                 
@@ -45,13 +45,13 @@ async def telegram_webhook(req: Request):
                 server_id = "-"
 
                 for line in caption_text.split("\n"):
-                    line_str = line.strip()
-                    if "ပစ္စည်း:" in line_str:
-                        item_name = line_str.split("ပစ္စည်း:")[-1].replace("**", "").strip()
-                    elif "Game ID:" in line_str:
-                        game_id = line_str.split("Game ID:")[-1].replace("`", "").replace("**", "").strip()
-                    elif "Server:" in line_str:
-                        server_id = line_str.split("Server:")[-1].replace("`", "").replace("**", "").strip()
+                    clean = line.replace("*", "").replace("`", "").strip()
+                    if "ပစ္စည်း:" in clean:
+                        item_name = clean.split("ပစ္စည်း:")[-1].strip()
+                    elif "Game ID:" in clean:
+                        game_id = clean.split("Game ID:")[-1].strip()
+                    elif "Server:" in clean:
+                        server_id = clean.split("Server:")[-1].strip()
 
                 # အချိန်နှင့် ရက်စွဲ
                 tz = pytz.timezone("Asia/Yangon")
@@ -59,7 +59,6 @@ async def telegram_webhook(req: Request):
                 now_time = now.strftime("%I:%M %p")
                 now_date = now.strftime("%d/%m/%Y")
 
-                # Customer ဆီ ပို့မည့် စာသား
                 customer_msg = (
                     f"==== Transaction Report ====\n"
                     f"UID  : {game_id}({server_id})\n"
@@ -72,14 +71,14 @@ async def telegram_webhook(req: Request):
                     f"May Lay Game Store ကို အသုံးပြုပေးသည့်အတွက် ကျေးဇူးအထူးတင်ရှိပါသည်ရှင့်။ 🙏"
                 )
                 
-                async with httpx.AsyncClient(timeout=10.0) as client:
-                    # ၁။ Pop-up အသိပေးချက်ကို ဦးစွာ ပိတ်ခြင်း (Telegram Timeout မဖြစ်စေရန်)
+                async with httpx.AsyncClient(timeout=15.0) as client:
+                    # ၁။ Telegram Pop-up ချက်ချင်းပိတ်ခြင်း
                     await client.post(
                         f"https://api.telegram.org/bot{BOT_TOKEN}/answerCallbackQuery",
-                        json={"callback_query_id": callback_id, "text": "စိန်ဖြည့်ပြီးကြောင်း အကြောင်းကြားစာ ပို့နေပါသည်ရှင့်..."}
+                        json={"callback_query_id": callback_id, "text": "Customer ဆီ စာပို့လိုက်ပါပြီရှင့်!"}
                     )
 
-                    # ၂။ Customer ဆီ မက်ဆေ့ခ်ျပို့ခြင်း
+                    # ၂။ Customer ဆီ စာပို့ခြင်း
                     await client.post(
                         f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
                         json={
@@ -88,10 +87,9 @@ async def telegram_webhook(req: Request):
                         }
                     )
                     
-                    # ၃။ Admin ဘက်က ခလုတ်ကို 'ပြီးပါပြီ' အဖြစ် ပြောင်းလဲခြင်း
+                    # ၃။ Admin Message ခလုတ်အား 'ပြီးပါပြီ' အဖြစ် ပြောင်းလဲခြင်း
                     chat_id = msg.get("chat", {}).get("id")
                     message_id = msg.get("message_id")
-                    
                     if chat_id and message_id:
                         await client.post(
                             f"https://api.telegram.org/bot{BOT_TOKEN}/editMessageReplyMarkup",
@@ -108,5 +106,5 @@ async def telegram_webhook(req: Request):
 
         return {"ok": True}
     except Exception as e:
-        print("Webhook Error:", e)
-        return {"ok": False, "error": str(e)}
+        print("Error:", e)
+        return {"ok": False}
