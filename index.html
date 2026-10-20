@@ -122,9 +122,9 @@
         .row { display: flex; gap: 10px; }
         .col-7 { flex: 7; } .col-5 { flex: 5; }
 
-        .bank-card { background: #0b1220; border: 1px solid #1f3454; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; }
-        .bank-card .title { color: #38bdf8; font-weight: bold; margin-bottom: 6px; }
-        .warning-box { background: rgba(239, 68, 68, 0.12); border: 1px solid #ef4444; padding: 8px 10px; border-radius: 6px; font-size: 11.5px; color: #fca5a5; margin-bottom: 14px; line-height: 1.4; }
+        .bank-card { background: #0b1220; border: 1px solid #1f3454; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; line-height: 1.5; }
+        .bank-card .title { color: #38bdf8; font-weight: bold; margin-bottom: 8px; }
+        .warning-box { background: rgba(239, 68, 68, 0.12); border: 1px solid #ef4444; padding: 10px; border-radius: 6px; font-size: 12px; color: #fca5a5; margin-bottom: 14px; line-height: 1.5; }
         .submit-btn { width: 100%; padding: 13px; background: #0284c7; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; }
     </style>
 </head>
@@ -179,8 +179,9 @@
             <div id="paymentBox"></div>
 
             <div class="warning-box">
-                ⚠️ <strong>သတိပြုရန်:</strong> Game ID နှင့် Server နံပါတ် မှန်ကန်စွာ ဖြည့်သွင်းပေးပါရှင့်။<br>
-                ❌ Note တွင် စိန်ဝယ်ခြင်း၊ MLBB စသည့် ဂိမ်းနာမည်များ လုံးဝမရေးရပါ။
+                ⚠️ <strong>စည်းကမ်းချက်:</strong><br>
+                • Note တွင် (Payment) ဟုသာ ရေးပေးပါရန်။<br>
+                ❌ Note တွင် dia , Skin , Weekly pass , စိန်ဝယ်ခြင်း ဟု ရေးပါက လုံးဝထည့်မပေးပါရှင့်။
             </div>
 
             <label>ငွေလွှဲပြေစာ (စလစ်) ပုံရွေးပါ</label>
@@ -302,10 +303,15 @@
             } else {
                 pBox.innerHTML = `
                     <div class="bank-card">
-                        <div class="title">🇲🇲 မြန်မာကျပ်ငွေလွှဲရန် အကောင့်</div>
-                        <p>📱 <strong>KPay / WavePay</strong></p>
-                        <p>• Account No: <strong>09776100118</strong></p>
-                        <p>• Name: <strong>Daw May Thazin</strong></p>
+                        <div class="title">🇲🇲 မြန်မာကျပ်ငွေလွှဲရန် အကောင့်များ 💰</div>
+                        <p>🔹 <strong>KBZPay</strong></p>
+                        <p>• Phone: <strong>09779091686</strong></p>
+                        <p>• Name: <strong>Ei Ei Phyu</strong></p>
+                        <br>
+                        <p>🔹 <strong>WavePay</strong></p>
+                        <p>• Phone: <strong>09986422066</strong></p>
+                        <p>• Name: <strong>Swan Pyae Sone</strong></p>
+                        <br>
                         <p>• ကျသင့်ငွေ: <strong style="color: #4ade80;">${Number(selectedProduct.mmk).toLocaleString()} Ks</strong></p>
                     </div>
                 `;
@@ -352,7 +358,7 @@
             const caption = `🚨 **အော်ဒါအသစ် ရောက်ရှိပါသည်!** 🚨\n\n` +
                 `💎 **ပစ္စည်း:** ${selectedProduct.name}\n` +
                 `💰 **ကျသင့်ငွေ:** ${amountText}\n` +
-                `🌐 **ငွေပေးချေမှု:** ${currentCurrency === "THB" ? "ထိုင်းဘတ် (Bangkok Bank)" : "မြန်မာကျပ် (KPay / Wave)"}\n\n` +
+                `🌐 **ငွေပေးချေမှု:** ${currentCurrency === "THB" ? "ထိုင်းဘတ် (Bangkok Bank)" : "မြန်မာကျပ် (KBZPay / WavePay)"}\n\n` +
                 `🆔 **Game ID:** \`${gameId}\`\n` +
                 `🌐 **Server:** \`${serverId}\`\n` +
                 `🧾 **SN:** \`${snCode}\`\n\n` +
@@ -360,7 +366,6 @@
                 `🆔 **User Telegram ID:** \`${buyerId}\`\n` +
                 `⏰ **အချိန်:** ${new Date().toLocaleString()}`;
 
-            // callback_data ထဲတွင် Delimiter ကို '|' ဖြင့် တိကျစွာ ခွဲခြားထားပါသည်
             const replyMarkup = {
                 inline_keyboard: [
                     [
