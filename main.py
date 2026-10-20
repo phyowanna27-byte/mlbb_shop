@@ -22,17 +22,18 @@ def home():
 
 @app.get("/check")
 async def check_mlbb(id: str, zone: str):
-    # Tokovoucher Signature Hash: md5(member_code + secret_key)
+    # Tokovoucher Signature Formula
     sig_raw = f"{MEMBER_CODE}:{SECRET_KEY}"
     signature = hashlib.md5(sig_raw.encode()).hexdigest()
 
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "application/json"
     }
 
-    # 1. Official Tokovoucher Game Check API
+    # 1. Tokovoucher Official Check API
     try:
-        url_toko = f"https://api-check.tokovoucher.net/v1/check-game?game=mlbb&user_id={id}&zone_id={zone}&member_code={MEMBER_CODE}&signature={signature}"
+        url_toko = f"https://api.tokovoucher.net/v1/check-game?member_code={MEMBER_CODE}&signature={signature}&game=mobile-legends&id={id}&zone={zone}"
         async with httpx.AsyncClient(timeout=10.0, headers=headers) as client:
             resp = await client.get(url_toko)
             data = resp.json()
@@ -41,15 +42,15 @@ async def check_mlbb(id: str, zone: str):
                 or data.get("data", {}).get("name")
                 or data.get("name")
             )
-            if name and "null" not in str(name).lower():
+            if name and str(name).strip() and "null" not in str(name).lower():
                 return {"success": True, "name": name}
     except Exception:
         pass
 
-    # 2. Tokovoucher Public/Partner Fallback
+    # 2. Tokovoucher Secondary Endpoint
     try:
-        url_toko2 = f"https://api-check.tokovoucher.net/v1/check-game?game=mlbb&user_id={id}&zone_id={zone}"
-        async with httpx.AsyncClient(timeout=8.0, headers=headers) as client:
+        url_toko2 = f"https://api.tokovoucher.net/v1/check-game?member_code={MEMBER_CODE}&signature={signature}&game=mlbb&user_id={id}&zone_id={zone}"
+        async with httpx.AsyncClient(timeout=10.0, headers=headers) as client:
             resp = await client.get(url_toko2)
             data = resp.json()
             name = (
@@ -57,12 +58,12 @@ async def check_mlbb(id: str, zone: str):
                 or data.get("data", {}).get("name")
                 or data.get("name")
             )
-            if name and "null" not in str(name).lower():
+            if name and str(name).strip() and "null" not in str(name).lower():
                 return {"success": True, "name": name}
     except Exception:
         pass
 
-    # 3. Moonton Partner Direct Fallback
+    # 3. Direct Moonton Rolequery Fallback
     try:
         url_smile = "https://www.smile.one/smilecoin/api/rolequery"
         payload = {"userid": id, "zoneid": zone, "pid": 13}
